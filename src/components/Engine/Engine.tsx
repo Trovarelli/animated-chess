@@ -126,9 +126,11 @@ export const Engine = ({ height, width }: EngineProps) => {
             className={clsx("absolute", {
               "bg-white/10": isLight,
               "bg-black/10": !isLight,
-              "animate-chess-pulse duration-700 z-10 cursor-pointer": isPath,
-              "!bg-blue-200": isPath && !hasEnemy,
-              "!bg-red-200": isPath && hasEnemy,
+              "animate-pulse duration-700 z-10 cursor-pointer": isPath,
+              "!bg-[url('/path/base-path.png')] bg-no-repeat bg-center cursor-pointer [background-size:auto_50px]":
+                isPath && !hasEnemy,
+              "!bg-[url('/mark/base-mark.png')] bg-no-repeat bg-center cursor-pointer bg-contain":
+                isPath && hasEnemy,
             })}
             style={{
               width: cellSize,
@@ -230,7 +232,7 @@ export const Engine = ({ height, width }: EngineProps) => {
         {Array.from({ length: BOARD_SIZE }).map((_, i) => (
           <React.Fragment key={i}>
             <div
-              className="absolute text-sm text-white font-medium"
+              className="absolute text-sm text-white font-bold"
               style={{
                 left: offsetX + i * cellSize + cellSize / 2,
                 top: offsetY + BOARD_SIZE * cellSize + 10,
@@ -240,7 +242,7 @@ export const Engine = ({ height, width }: EngineProps) => {
               {String.fromCharCode(65 + i)}
             </div>
             <div
-              className="absolute text-sm text-white font-medium"
+              className="absolute text-white font-bold"
               style={{
                 top: offsetY + i * cellSize + cellSize / 2,
                 left: offsetX - 20,
