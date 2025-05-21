@@ -39,7 +39,6 @@ export const useCanvasSprite = ({
     img.onerror = () => console.error('Falha ao carregar sprite:', sprite);
   }, [sprite]);
 
-  // Peças Mortas por exemplo
   useEffect(() => {
     if (frames === 1 && isLoaded && canvasRef.current && imageRef.current) {
       const canvas = canvasRef.current;

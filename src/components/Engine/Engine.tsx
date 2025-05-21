@@ -13,6 +13,7 @@ import { ChessPiece, defaultPiecesInfo } from "../ChessPiece";
 import { EngineProps } from "./types";
 import { GameContext } from "@/context/GameContext";
 import { GetNegativeColor } from "@/utils/GetNegativeColor";
+import { Board } from "./components/Board/Board";
 
 export const Engine = ({ height, width }: EngineProps) => {
   const {
@@ -103,53 +104,6 @@ export const Engine = ({ height, width }: EngineProps) => {
       setTurn,
     ]
   );
-
-  const renderBoard = useMemo(() => {
-    return Array(BOARD_SIZE * BOARD_SIZE)
-      .fill(null)
-      .map((_, index) => {
-        const x = index % BOARD_SIZE;
-        const y = Math.floor(index / BOARD_SIZE);
-        const isPath = path.some((p) => p.x === x && p.y === y);
-        const isLight = (x + y) % 2 === 0;
-        const hasEnemy = piecesInfo.some(
-          (p) =>
-            p.coords.x === x &&
-            p.coords.y === y &&
-            p.color !== selectedPieceCoords?.color
-        );
-
-        return (
-          <div
-            key={`${x}-${y}`}
-            onClick={() => isPath && handleSquareClick({ x, y } as BasicCoords)}
-            className={clsx("absolute", {
-              "bg-white/10": isLight,
-              "bg-black/10": !isLight,
-              "animate-pulse duration-700 z-10 cursor-pointer": isPath,
-              "!bg-[url('/path/base-path.png')] bg-no-repeat bg-center cursor-pointer [background-size:auto_50px]":
-                isPath && !hasEnemy,
-              "!bg-[url('/mark/base-mark.png')] bg-no-repeat bg-center cursor-pointer bg-contain":
-                isPath && hasEnemy,
-            })}
-            style={{
-              width: cellSize,
-              height: cellSize,
-              left: offsetX + x * cellSize,
-              top: offsetY + y * cellSize,
-            }}
-          />
-        );
-      });
-  }, [
-    path,
-    piecesInfo,
-    cellSize,
-    offsetX,
-    offsetY,
-    handleSquareClick,
-    selectedPieceCoords,
-  ]);
 
   const renderPieces = useMemo(() => {
     return (
@@ -259,7 +213,16 @@ export const Engine = ({ height, width }: EngineProps) => {
 
   return (
     <div className="relative" style={{ width, height }}>
-      {renderBoard}
+      <Board
+        path={path}
+        piecesInfo={piecesInfo}
+        cellSize={cellSize}
+        offsetX={offsetX}
+        offsetY={offsetY}
+        color={selectedPieceCoords?.color}
+        handleSquareClick={handleSquareClick}
+        BOARD_SIZE={BOARD_SIZE}
+      />
       {renderPieces}
       {renderCoordinates}
     </div>
