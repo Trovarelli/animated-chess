@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BasicCoords, ChessboardContext } from "@/context";
-import clsx from "clsx";
 import { ChessPiece, defaultPiecesInfo } from "../ChessPiece";
 import { EngineProps } from "./types";
 import { GameContext } from "@/context/GameContext";
@@ -148,7 +147,7 @@ export const Engine = ({ height, width }: EngineProps) => {
                 initial={{ x: initialX, y: initialY }}
                 animate={{ x: targetX, y: targetY }}
                 transition={{ type: "tween", duration: 0.3 }}
-                className="absolute overflow-hidden"
+                className="absolute"
                 style={{ width: cellSize, height: cellSize }}
                 onClick={handlePieceClick}
               >
@@ -157,13 +156,12 @@ export const Engine = ({ height, width }: EngineProps) => {
                   height={cellSize}
                   type={piece.type}
                   color={piece.color}
-                  className={clsx("", {
-                    "cursor-pointer": isYourTurn,
-                  })}
+                  isYourTurn={isYourTurn}
                   isAttacking={isAttacking && piece.alive}
                   isMoving={false}
                   isHit={false}
                   isDead={!piece.alive}
+                  isSelected={selectedPieceCoords?.id === piece.id}
                 />
               </motion.div>
             );
@@ -177,6 +175,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     offsetY,
     path,
     turn,
+    selectedPieceCoords?.id,
     setSelectedPieceCoords,
   ]);
 

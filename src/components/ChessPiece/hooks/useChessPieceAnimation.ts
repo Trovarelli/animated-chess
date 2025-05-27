@@ -3,7 +3,7 @@ import { PiecesTypes } from "../types";
 const WHITE_SPRITESHEET = "/sprites/Pieces/White";
 const BLACK_SPRITESHEET = "/sprites/Pieces/Black";
 
-type AnimationType = "idle" | "walk" | "attack" | "hit" | "death";
+type AnimationType = "idle" | "walk" | "attack" | "hit" | "death" | 'selected';
 
 interface AnimationFrameConfig {
   row: number;
@@ -36,6 +36,8 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 5, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
+
       },
     },
     knight: {
@@ -46,6 +48,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 7, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 7, fps: 8}
       },
     },
     king: {
@@ -56,6 +59,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 5, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     bishop: {
@@ -66,6 +70,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 9, fps: 12 },
         death: { row: 6, frames: 4, fps: 8 },
         hit: { row: 5, frames: 4, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     queen: {  
@@ -76,6 +81,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 5, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     rook: {
@@ -86,6 +92,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 5, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
   },
@@ -98,6 +105,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 6, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     knight: {
@@ -108,6 +116,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 7, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     king: {
@@ -118,6 +127,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 6, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     bishop: {
@@ -128,6 +138,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 6, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     queen: {
@@ -138,6 +149,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 6, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
     rook: {
@@ -148,6 +160,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 6, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
+        selected: {row: 2, frames: 6, fps: 8}
       },
     },
   },

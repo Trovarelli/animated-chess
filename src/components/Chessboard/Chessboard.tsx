@@ -40,9 +40,6 @@ export const Chessboard = () => {
 
   const cellSize = Math.min(boardSize, boardSize) / 8;
 
-  console.log(deadWhite);
-  console.log(deadBlack);
-
   return (
     <div
       ref={containerRef}

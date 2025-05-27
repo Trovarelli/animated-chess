@@ -1,48 +1,60 @@
-import { useCanvasSprite } from "@/hooks";
+import { useCanvasSprite } from "@/hooks/useCanvasSprite";
 import { AnimatedCellProps } from "./types";
 
 export const AnimatedCell = ({
-  cellSize,
-  offsetX,
-  offsetY,
   x,
   y,
   onClick,
   sprite,
+  fps,
+  frames,
+  cellWidth,
+  cellHeight,
+  row,
+  loop,
+  trimLeft,
+  trimRight,
+  trimTop,
+  trimBottom,
+  displayWidth,
+  displayHeight,
+  style,
 }: AnimatedCellProps) => {
   const {
     canvasRef,
-    width: frameWidth,
-    height: frameHeight,
+    internalWidth,
+    internalHeight,
+    displayWidth: dispW,
+    displayHeight: dispH,
   } = useCanvasSprite({
     sprite,
-    frames: 7,
-    fps: 10,
-    width: 64,
-    height: 64,
-    row: 0,
-    loop: true,
+    frames,
+    fps,
+    frameWidth: cellWidth,
+    frameHeight: cellHeight,
+    row,
+    loop,
+    trimLeft,
+    trimRight,
+    trimTop,
+    trimBottom,
+    displayWidth,
+    displayHeight,
   });
 
   return (
     <div
-      onClick={() => onClick({ x, y })}
-      className="cursor-pointer"
-      style={{
-        width: cellSize,
-        height: cellSize,
-        left: offsetX + (x || 0) * cellSize,
-        top: offsetY + (y || 0) * cellSize,
-      }}
+      onClick={() => onClick && x != null && y != null && onClick({ x, y })}
+      style={style}
     >
       <canvas
         ref={canvasRef}
-        width={frameWidth}
-        height={frameHeight}
+        width={internalWidth}
+        height={internalHeight}
         style={{
           imageRendering: "pixelated",
-          width: `${frameWidth}px`,
-          height: `${frameHeight}px`,
+          width: `${dispW}px`,
+          height: `${dispH}px`,
         }}
       />
     </div>

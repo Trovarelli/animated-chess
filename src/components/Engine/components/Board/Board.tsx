@@ -44,15 +44,24 @@ export const Board = ({
             top: offsetY + y * cellSize,
           }}
         >
-          {isPath && (
+          {isPath && !hasEnemy && (
             <AnimatedCell
-              cellSize={cellSize}
-              offsetX={offsetX}
-              offsetY={offsetY}
               sprite={"/flags/FlagRed.png"}
               x={x as BasicCoords["x"]}
               y={y as BasicCoords["y"]}
               onClick={handleSquareClick}
+              frames={7}
+              fps={10}
+              displayWidth={cellSize}
+              displayHeight={cellSize}
+              row={0}
+              loop
+              cellWidth={64}
+              cellHeight={64}
+              style={{
+                scale: 0.5,
+                transform: "translate(25%)",
+              }}
             />
           )}
         </div>
