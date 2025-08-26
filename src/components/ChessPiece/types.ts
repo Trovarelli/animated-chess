@@ -16,6 +16,7 @@ export interface ChessPieceProps {
   className?: string;
   isAttacking?: boolean;
   isMoving?: boolean;
+  moveKey?: string;
   isHit?: boolean;
   isDead?: boolean;
   isSelected?: boolean;
