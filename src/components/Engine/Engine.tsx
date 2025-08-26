@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BasicCoords, ChessboardContext } from "@/context";
@@ -30,14 +31,17 @@ export const Engine = ({ height, width }: EngineProps) => {
   const cellSize = Math.min(width, height) / BOARD_SIZE;
   const offsetX = (width - BOARD_SIZE * cellSize) / 2;
   const offsetY = (height - BOARD_SIZE * cellSize) / 2;
-  const previousPositions = useRef<Map<string, BasicCoords>>(new Map());
+  const previousPositionsRef = useRef<Map<string, BasicCoords>>(new Map());
+  const [moveVersion, setMoveVersion] = useState(0);
 
   useEffect(() => {
     const newPositions = new Map<string, BasicCoords>();
     piecesInfo.forEach((piece) => {
       newPositions.set(piece.id, { ...piece.coords });
     });
-    previousPositions.current = newPositions;
+    previousPositionsRef.current = newPositions;
+    const id = setTimeout(() => setMoveVersion((v) => v + 1), 300);
+    return () => clearTimeout(id);
   }, [piecesInfo]);
 
   useEffect(() => {
@@ -110,7 +114,7 @@ export const Engine = ({ height, width }: EngineProps) => {
         {piecesInfo
           .filter((p) => p.alive)
           .map((piece) => {
-            const prevPos = previousPositions.current.get(piece.id);
+            const prevPos = previousPositionsRef.current.get(piece.id);
             const targetX = offsetX + piece.coords.x! * cellSize;
             const targetY = offsetY + piece.coords.y! * cellSize;
             const initialX = prevPos
@@ -158,7 +162,12 @@ export const Engine = ({ height, width }: EngineProps) => {
                   color={piece.color}
                   isYourTurn={isYourTurn}
                   isAttacking={isAttacking && piece.alive}
-                  isMoving={false}
+                  isMoving={
+                    prevPos &&
+                    (prevPos.x !== piece.coords.x ||
+                      prevPos.y !== piece.coords.y)
+                  }
+                  moveKey={`${prevPos?.x}-${prevPos?.y}->${piece.coords.x}-${piece.coords.y}-${moveVersion}`}
                   isHit={false}
                   isDead={!piece.alive}
                   isSelected={selectedPieceCoords?.id === piece.id}
@@ -177,6 +186,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     turn,
     selectedPieceCoords?.id,
     setSelectedPieceCoords,
+    moveVersion,
   ]);
 
   const renderCoordinates = useMemo(() => {

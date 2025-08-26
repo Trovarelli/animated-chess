@@ -11,6 +11,7 @@ export const ChessPiece = ({
   type,
   isAttacking,
   isMoving,
+  moveKey,
   isHit,
   isDead,
   color,
@@ -22,6 +23,7 @@ export const ChessPiece = ({
   const currentAnimation = useChessPieceState({
     isAttacking,
     isMoving,
+    moveKey,
     isHit,
     isDead,
     isSelected,
