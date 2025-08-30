@@ -48,7 +48,7 @@ const ANIMATION_CONFIGS: Record<"black" | "white", Record<PiecesTypes, PIECE_CON
         attack: { row: 2, frames: 6, fps: 8 },
         death: { row: 7, frames: 4, fps: 8 },
         hit: { row: 4, frames: 6, fps: 8 },
-        selected: {row: 2, frames: 7, fps: 8}
+        selected: {row: 2, frames: 8, fps: 8}
       },
     },
     king: {

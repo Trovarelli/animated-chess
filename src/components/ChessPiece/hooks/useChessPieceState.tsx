@@ -18,7 +18,7 @@ export const useChessPieceState = ({
   const timeoutToIdle = useCallback(() => {
     setTimeout(() => {
       setCurrentAnimation("idle");
-    }, 100);
+    }, 1000);
   }, []);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const useChessPieceState = ({
     else if (isHit) setCurrentAnimation("hit");
     else if (isSelected) {
       setCurrentAnimation("selected");
-      timeoutToIdle();
+      // timeoutToIdle();
     } else setCurrentAnimation("idle");
   }, [isAttacking, isMoving, isHit, isDead, isSelected, timeoutToIdle]);
 

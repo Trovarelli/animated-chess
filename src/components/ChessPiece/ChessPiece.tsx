@@ -42,15 +42,20 @@ export const ChessPiece = ({
       displayHeight={height}
       style={{
         cursor: isYourTurn ? "pointer" : "default",
+        scale: 1.1,
       }}
       row={row}
-      loop={currentAnimation === "idle" || currentAnimation === "walk"}
+      loop={
+        currentAnimation === "idle" ||
+        currentAnimation === "walk" ||
+        currentAnimation === "selected"
+      }
       cellWidth={FRAME_WIDTH}
       cellHeight={FRAME_HEIGHT}
-      trimLeft={25}
-      trimRight={25}
-      trimTop={19}
-      trimBottom={35}
+      trimLeft={20}
+      trimRight={20}
+      trimTop={18}
+      trimBottom={26}
     />
   );
 };
