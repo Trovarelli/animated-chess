@@ -71,6 +71,29 @@ O jogo é totalmente responsivo e funciona em:
 - Smartphone
 - Orientação paisagem e retrato
 
+## 🧪 Testes E2E
+
+O projeto inclui **70 testes E2E** usando Cypress que cobrem todas as funcionalidades principais:
+
+```bash
+# Executar testes em modo interativo
+npm run cypress:open
+
+# Executar testes em modo headless
+npm run cypress:run
+```
+
+Cobertura de testes:
+- ✅ Inicialização do jogo (13 testes)
+- ✅ Movimentação de peças (10 testes)
+- ✅ Gerenciamento de turnos (12 testes)
+- ✅ Sistema de reset (14 testes)
+- ✅ Histórico de movimentos (11 testes)
+- ✅ Cenários de fim de jogo (12 testes)
+
+Para mais informações, consulte [cypress/README.md](cypress/README.md).
+
+
 ## 🤝 Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para:
