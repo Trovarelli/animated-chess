@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BasicCoords, ChessboardContext } from "@/context";
@@ -25,6 +26,11 @@ export const Engine = ({ height, width }: EngineProps) => {
   } = useContext(ChessboardContext);
 
   const { setTurn, turn, setGameOver, addMove } = useContext(GameContext);
+
+  const [attackingPieceId, setAttackingPieceId] = useState<string | null>(null);
+  const [dyingPieceId, setDyingPieceId] = useState<string | null>(null);
+  const [dyingPiecePosition, setDyingPiecePosition] = useState<BasicCoords | null>(null);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const BOARD_SIZE = 8;
   const cellSize = Math.min(width, height) / BOARD_SIZE;
@@ -47,20 +53,23 @@ export const Engine = ({ height, width }: EngineProps) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [setPath]);
 
-  // Listen for reset game events
   useEffect(() => {
     const handleResetGame = () => {
       setPiecesInfo(defaultPiecesInfo);
       setSelectedPieceCoords(null);
       setPath([]);
+      setAttackingPieceId(null);
+      setDyingPieceId(null);
+      setDyingPiecePosition(null);
+      setIsAnimating(false);
     };
     window.addEventListener('resetGame', handleResetGame);
     return () => window.removeEventListener('resetGame', handleResetGame);
   }, [setPiecesInfo, setSelectedPieceCoords, setPath]);
 
   const handleSquareClick = useCallback(
-    (targetCoords: BasicCoords) => {
-      if (!selectedPieceCoords) return;
+    async (targetCoords: BasicCoords) => {
+      if (!selectedPieceCoords || isAnimating) return;
 
       // Create notation for the move
       const fromCol = String.fromCharCode(97 + selectedPieceCoords.coords.x!);
@@ -89,7 +98,6 @@ export const Engine = ({ height, width }: EngineProps) => {
       const captureSymbol = capturedPiece ? "x" : "";
       const notation = `${pieceSymbol}${fromCol}${fromRow}${captureSymbol}${toCol}${toRow}`;
 
-      // Add move to history
       addMove({
         from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
         to: { row: targetCoords.y!, col: targetCoords.x! },
@@ -99,8 +107,35 @@ export const Engine = ({ height, width }: EngineProps) => {
         timestamp: Date.now(),
       });
 
-      setPiecesInfo((prev) => {
-        if (capturedPiece?.type === "king") {
+      if (capturedPiece) {
+        setIsAnimating(true);
+        setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
+
+        setPiecesInfo((prev) =>
+          prev.map((piece) =>
+            piece.id === selectedPieceCoords.id
+              ? {
+                  ...piece,
+                  coords: targetCoords,
+                  ...(piece.type === "pawn" && { firstMove: false }),
+                }
+              : piece
+          )
+        );
+
+        setSelectedPieceCoords(null);
+        setPath([]);
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        setAttackingPieceId(selectedPieceCoords.id);
+        await new Promise(resolve => setTimeout(resolve, 750));
+
+        setDyingPieceId(capturedPiece.id);
+        setAttackingPieceId(null);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        if (capturedPiece.type === "king") {
           setGameOver({
             over: true,
             winner: {
@@ -113,27 +148,43 @@ export const Engine = ({ height, width }: EngineProps) => {
             },
           });
 
-          return defaultPiecesInfo;
+          setPiecesInfo(defaultPiecesInfo);
+          setDyingPieceId(null);
+          setDyingPiecePosition(null);
+          return;
         }
 
-        return prev.map((piece) => {
-          if (capturedPiece?.id === piece.id) {
-            return { ...piece, alive: false, coords: { x: null, y: null } };
-          }
-          if (piece.id === selectedPieceCoords.id) {
-            setTurn(GetNegativeColor(piece.color));
-            return {
-              ...piece,
-              coords: targetCoords,
-              ...(piece.type === "pawn" && { firstMove: false }),
-            };
-          }
-          return piece;
-        });
-      });
+        setPiecesInfo((prev) =>
+          prev.map((piece) =>
+            piece.id === capturedPiece.id
+              ? { ...piece, alive: false, coords: { x: null, y: null } }
+              : piece
+          )
+        );
 
-      setSelectedPieceCoords(null);
-      setPath([]);
+        setDyingPieceId(null);
+        setDyingPiecePosition(null);
+
+        setTurn(GetNegativeColor(selectedPieceCoords.color));
+        setIsAnimating(false);
+      } else {
+        setPiecesInfo((prev) =>
+          prev.map((piece) => {
+            if (piece.id === selectedPieceCoords.id) {
+              setTurn(GetNegativeColor(piece.color));
+              return {
+                ...piece,
+                coords: targetCoords,
+                ...(piece.type === "pawn" && { firstMove: false }),
+              };
+            }
+            return piece;
+          })
+        );
+
+        setSelectedPieceCoords(null);
+        setPath([]);
+      }
     },
     [
       selectedPieceCoords,
@@ -151,7 +202,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     return (
       <AnimatePresence>
         {piecesInfo
-          .filter((p) => p.alive)
+          .filter((p) => p.alive && p.id !== dyingPieceId) // Filter out dying piece
           .map((piece) => {
             const prevPos = previousPositions.current.get(piece.id);
             const targetX = offsetX + piece.coords.x! * cellSize;
@@ -166,21 +217,10 @@ export const Engine = ({ height, width }: EngineProps) => {
               (p) => p.x === piece.coords.x && p.y === piece.coords.y
             );
             const isYourTurn = piece.color === turn;
-            // const isSelected = selectedPieceCoords?.id === piece.id;
-            const isAttacking = path.some(
-              (p) =>
-                p.x === piece.coords.x &&
-                p.y === piece.coords.y &&
-                piecesInfo.some(
-                  (target) =>
-                    target.coords.x === p.x &&
-                    target.coords.y === p.y &&
-                    target.color !== piece.color
-                )
-            );
+            const isAttacking = attackingPieceId === piece.id;
 
             const handlePieceClick = () => {
-              if (!isSelectable || !isYourTurn) return;
+              if (!isSelectable || !isYourTurn || isAnimating) return;
               setSelectedPieceCoords(piece);
             };
 
@@ -200,7 +240,7 @@ export const Engine = ({ height, width }: EngineProps) => {
                   type={piece.type}
                   color={piece.color}
                   isYourTurn={isYourTurn}
-                  isAttacking={isAttacking && piece.alive}
+                  isAttacking={isAttacking}
                   isMoving={false}
                   isHit={false}
                   isDead={!piece.alive}
@@ -220,7 +260,44 @@ export const Engine = ({ height, width }: EngineProps) => {
     turn,
     selectedPieceCoords?.id,
     setSelectedPieceCoords,
+    attackingPieceId,
+    dyingPieceId,
   ]);
+
+  const renderDyingPiece = useMemo(() => {
+    if (!dyingPieceId || !dyingPiecePosition) return null;
+
+    const dyingPiece = piecesInfo.find((p) => p.id === dyingPieceId);
+    if (!dyingPiece) return null;
+
+    const x = offsetX + dyingPiecePosition.x! * cellSize;
+    const y = offsetY + dyingPiecePosition.y! * cellSize;
+
+    return (
+      <motion.div
+        key={`dying-${dyingPieceId}`}
+        initial={{ x, y }}
+        style={{
+          position: "absolute",
+          width: cellSize,
+          height: cellSize,
+        }}
+      >
+        <ChessPiece
+          width={cellSize}
+          height={cellSize}
+          type={dyingPiece.type}
+          color={dyingPiece.color}
+          isYourTurn={false}
+          isAttacking={false}
+          isMoving={false}
+          isHit={true}
+          isDead={true}
+          isSelected={false}
+        />
+      </motion.div>
+    );
+  }, [dyingPieceId, dyingPiecePosition, piecesInfo, cellSize, offsetX, offsetY]);
 
   const renderCoordinates = useMemo(() => {
     return (
@@ -266,6 +343,7 @@ export const Engine = ({ height, width }: EngineProps) => {
         BOARD_SIZE={BOARD_SIZE}
       />
       {renderPieces}
+      {renderDyingPiece}
       {renderCoordinates}
     </div>
   );
