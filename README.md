@@ -19,6 +19,8 @@ Um jogo de xadrez moderno e interativo com animações fluidas e uma interface e
 - [Framer Motion](https://www.framer.com/motion/) - Biblioteca de animações
 - [Tailwind CSS](https://tailwindcss.com/) - Framework CSS utilitário
 - [Next.js](https://nextjs.org/) - Framework React para produção
+- [Cypress](https://www.cypress.io/) - Framework de testes E2E
+- [Jest](https://jestjs.io/) - Framework de testes unitários
 
 ## 🛠️ Instalação
 
@@ -71,28 +73,45 @@ O jogo é totalmente responsivo e funciona em:
 - Smartphone
 - Orientação paisagem e retrato
 
-## 🧪 Testes E2E
+## 🧪 Testes
 
-O projeto inclui **70 testes E2E** usando Cypress que cobrem todas as funcionalidades principais:
+O projeto possui uma suíte completa de **70 testes E2E** usando Cypress.
+
+### Executar Testes
 
 ```bash
-# Executar testes em modo interativo
+# Modo interativo (recomendado para desenvolvimento)
 npm run cypress:open
 
-# Executar testes em modo headless
+# Modo headless (ideal para CI/CD)
 npm run cypress:run
+
+# Executar em um navegador específico
+npm run cypress:run:chrome
 ```
 
-Cobertura de testes:
-- ✅ Inicialização do jogo (13 testes)
-- ✅ Movimentação de peças (10 testes)
-- ✅ Gerenciamento de turnos (12 testes)
-- ✅ Sistema de reset (14 testes)
-- ✅ Histórico de movimentos (11 testes)
-- ✅ Cenários de fim de jogo (12 testes)
+### Cobertura de Testes
 
-Para mais informações, consulte [cypress/README.md](cypress/README.md).
+- ✅ **13 testes** - Inicialização do jogo
+- ✅ **10 testes** - Movimentação de peças
+- ✅ **12 testes** - Gerenciamento de turnos
+- ✅ **14 testes** - Sistema de reset
+- ✅ **11 testes** - Histórico de movimentos
+- ✅ **12 testes** - Cenários de fim de jogo
 
+📖 **Documentação completa**: [cypress/README.md](cypress/README.md)
+
+## 📜 Scripts Disponíveis
+
+```bash
+npm run dev          # Inicia servidor de desenvolvimento
+npm run build        # Gera build de produção
+npm run start        # Inicia aplicação em produção
+npm run lint         # Executa ESLint
+npm test             # Executa testes Jest
+npm run cypress:open # Abre interface do Cypress
+npm run cypress:run  # Executa testes Cypress (headless)
+```
 
 ## 🤝 Contribuindo
 
