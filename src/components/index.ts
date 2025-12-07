@@ -1,2 +1,5 @@
 export * from './Chessboard'
 export * from './ChessPiece'
+export * from './Header'
+export * from './MoveHistory'
+export * from './GameOverModal'

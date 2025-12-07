@@ -24,7 +24,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     selectedPieceCoords,
   } = useContext(ChessboardContext);
 
-  const { setTurn, turn, setGameOver } = useContext(GameContext);
+  const { setTurn, turn, setGameOver, addMove } = useContext(GameContext);
 
   const BOARD_SIZE = 8;
   const cellSize = Math.min(width, height) / BOARD_SIZE;
@@ -47,28 +47,69 @@ export const Engine = ({ height, width }: EngineProps) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [setPath]);
 
+  // Listen for reset game events
+  useEffect(() => {
+    const handleResetGame = () => {
+      setPiecesInfo(defaultPiecesInfo);
+      setSelectedPieceCoords(null);
+      setPath([]);
+    };
+    window.addEventListener('resetGame', handleResetGame);
+    return () => window.removeEventListener('resetGame', handleResetGame);
+  }, [setPiecesInfo, setSelectedPieceCoords, setPath]);
+
   const handleSquareClick = useCallback(
     (targetCoords: BasicCoords) => {
       if (!selectedPieceCoords) return;
 
-      setPiecesInfo((prev) => {
-        const capturedPiece = prev.find(
-          (p) =>
-            p.coords.x === targetCoords.x &&
-            p.coords.y === targetCoords.y &&
-            p.color !== selectedPieceCoords.color
-        );
+      // Create notation for the move
+      const fromCol = String.fromCharCode(97 + selectedPieceCoords.coords.x!);
+      const fromRow = 8 - selectedPieceCoords.coords.y!;
+      const toCol = String.fromCharCode(97 + targetCoords.x!);
+      const toRow = 8 - targetCoords.y!;
+      
+      
+      const capturedPiece = piecesInfo.find(
+        (p) =>
+          p.coords.x === targetCoords.x &&
+          p.coords.y === targetCoords.y &&
+          p.color !== selectedPieceCoords.color
+      );
 
+      // Standard chess notation symbols
+      const pieceSymbols: Record<string, string> = {
+        king: "K",
+        queen: "Q",
+        rook: "R",
+        bishop: "B",
+        knight: "N",
+        pawn: "",
+      };
+      const pieceSymbol = pieceSymbols[selectedPieceCoords.type] || "";
+      const captureSymbol = capturedPiece ? "x" : "";
+      const notation = `${pieceSymbol}${fromCol}${fromRow}${captureSymbol}${toCol}${toRow}`;
+
+      // Add move to history
+      addMove({
+        from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
+        to: { row: targetCoords.y!, col: targetCoords.x! },
+        piece: selectedPieceCoords.type,
+        captured: capturedPiece?.type,
+        notation,
+        timestamp: Date.now(),
+      });
+
+      setPiecesInfo((prev) => {
         if (capturedPiece?.type === "king") {
           setGameOver({
             over: true,
             winner: {
               color: GetNegativeColor(capturedPiece.color),
-              details: "O jogador ganhou",
+              details: "Xeque-mate!",
             },
             looser: {
               color: capturedPiece.color,
-              details: "O jogador perdeu",
+              details: "Rei capturado",
             },
           });
 
@@ -101,6 +142,8 @@ export const Engine = ({ height, width }: EngineProps) => {
       setPath,
       setGameOver,
       setTurn,
+      addMove,
+      piecesInfo,
     ]
   );
 

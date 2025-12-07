@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { GameContext } from "./contex";
-import { GameContextProviderProps, GameOverType } from "./types";
+import { GameContextProviderProps, GameOverType, Move } from "./types";
 
 export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const [turn, setTurn] = useState<"white" | "black" | null>("white");
@@ -15,6 +15,26 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
     },
     over: false,
   });
+  const [moveHistory, setMoveHistory] = useState<Move[]>([]);
+  const [isInCheck, setIsInCheck] = useState(false);
+
+  const addMove = useCallback((move: Move) => {
+    setMoveHistory(prev => [...prev, move]);
+  }, []);
+
+  const resetGame = useCallback(() => {
+    setTurn("white");
+    setGameOver({
+      looser: { color: null, details: "" },
+      winner: { color: null, details: "" },
+      over: false,
+    });
+    setMoveHistory([]);
+    setIsInCheck(false);
+    // Trigger a custom event that components can listen to
+    window.dispatchEvent(new CustomEvent('resetGame'));
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -22,6 +42,11 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
         setTurn,
         gameOver,
         setGameOver,
+        moveHistory,
+        addMove,
+        isInCheck,
+        setIsInCheck,
+        resetGame,
       }}
     >
       {children}

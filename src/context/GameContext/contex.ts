@@ -3,7 +3,7 @@ import { GameContextProps } from "./types";
 
 export const GameContext = createContext<GameContextProps>({
   turn: null,
-  setTurn: () => {},
+  setTurn: () => { },
   gameOver: {
     over: false,
     looser: {
@@ -15,5 +15,10 @@ export const GameContext = createContext<GameContextProps>({
       details: ''
     }
   },
-  setGameOver: () => {},
+  setGameOver: () => { },
+  moveHistory: [],
+  addMove: () => { },
+  isInCheck: false,
+  setIsInCheck: () => { },
+  resetGame: () => { },
 });
