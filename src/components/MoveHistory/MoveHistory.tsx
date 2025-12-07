@@ -1,6 +1,7 @@
 "use client";
 import { useContext, useRef, useEffect } from "react";
 import { GameContext } from "@/context";
+import { ChessPiece } from "@/components/ChessPiece";
 
 export const MoveHistory = () => {
   const { moveHistory } = useContext(GameContext);
@@ -23,12 +24,12 @@ export const MoveHistory = () => {
   }
 
   return (
-    <div className="w-64 bg-amber-900/30 backdrop-blur-sm border-2 border-amber-700 rounded-lg shadow-xl overflow-hidden">
-      <div className="bg-amber-800 px-4 py-3 border-b-2 border-amber-700">
-        <h2 className="text-lg font-bold text-amber-100 flex items-center gap-2">
+    <div className="absolute top-4 right-4 w-72 bg-gradient-to-b from-amber-950/80 via-stone-900/80 to-amber-950/80 backdrop-blur-md border-2 border-amber-700/60 rounded-lg shadow-2xl overflow-hidden z-10">
+      <div className="bg-amber-900/60 px-3 py-2 border-b-2 border-amber-700/50">
+        <h2 className="text-sm font-bold text-amber-100 flex items-center gap-2">
           📜 Histórico
         </h2>
-        <p className="text-xs text-amber-200">
+        <p className="text-xs text-amber-300/80">
           {moveHistory.length} movimento{moveHistory.length !== 1 ? "s" : ""}
         </p>
       </div>
@@ -39,38 +40,72 @@ export const MoveHistory = () => {
         style={{ scrollBehavior: "smooth" }}
       >
         {movePairs.length === 0 ? (
-          <div className="text-center py-8 text-amber-300/50">
-            <div className="text-4xl mb-2">♟️</div>
-            <p className="text-sm">Nenhum movimento ainda</p>
+          <div className="text-center py-6 text-amber-400/50">
+            <div className="text-3xl mb-1">♟️</div>
+            <p className="text-xs">Nenhum movimento</p>
           </div>
         ) : (
-          <div className="space-y-1">
-            {movePairs.map((pair) => (
-              <div
-                key={pair.moveNumber}
-                className="grid grid-cols-[auto_1fr_1fr] gap-2 items-center bg-amber-950/40 rounded px-2 py-1.5 hover:bg-amber-950/60 transition-colors"
-              >
-                <span className="text-amber-400 font-bold text-sm w-8">
-                  {pair.moveNumber}.
-                </span>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-white rounded-full border border-amber-600" />
-                  <span className="text-amber-100 text-sm font-mono">
-                    {pair.white?.notation || ""}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  {pair.black && (
-                    <>
-                      <div className="w-3 h-3 bg-gray-900 rounded-full border border-amber-600" />
-                      <span className="text-amber-100 text-sm font-mono">
-                        {pair.black.notation}
+          <div className="space-y-2">
+            {movePairs.map((pair) => {
+              return (
+                <div
+                  key={pair.moveNumber}
+                  className="bg-black/40 rounded px-3 py-2 hover:bg-black/60 transition-colors border border-amber-800/40"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-amber-400 font-bold min-w-[24px] text-sm">
+                      {pair.moveNumber}.
+                    </span>
+                    
+                    {/* White move */}
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="w-12 h-12 flex items-center justify-center">
+                        {pair.white && (
+                          <ChessPiece
+                            width={48}
+                            height={48}
+                            type={pair.white.piece as any}
+                            color="white"
+                            isYourTurn={false}
+                            isAttacking={false}
+                            isMoving={false}
+                            isHit={false}
+                            isDead={false}
+                            isSelected={false}
+                          />
+                        )}
+                      </div>
+                      <span className="text-amber-100 font-mono text-sm">
+                        {pair.white?.notation.substring(1) || ""}
                       </span>
-                    </>
-                  )}
+                    </div>
+                    
+                    {/* Black move */}
+                    {pair.black && (
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className="w-12 h-12 flex items-center justify-center">
+                          <ChessPiece
+                            width={48}
+                            height={48}
+                            type={pair.black.piece as any}
+                            color="black"
+                            isYourTurn={false}
+                            isAttacking={false}
+                            isMoving={false}
+                            isHit={false}
+                            isDead={false}
+                            isSelected={false}
+                          />
+                        </div>
+                        <span className="text-amber-100 font-mono text-sm">
+                          {pair.black.notation.substring(1)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

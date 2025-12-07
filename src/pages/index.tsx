@@ -6,12 +6,12 @@ export default function Home() {
   return (
     <GameContextProvider>
       <ChessboardContextProvider>
-        <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="w-screen h-screen flex flex-col overflow-hidden">
           <Header />
-          <div className="flex-1 flex gap-4 p-4 overflow-hidden">
-            <div className="flex-1 flex items-center justify-center">
-              <Chessboard />
-            </div>
+          <div className="flex-1 relative">
+            {/* Chessboard with battlefield background fills entire area */}
+            <Chessboard />
+            {/* Move history floats on top */}
             <MoveHistory />
           </div>
           <GameOverModal />

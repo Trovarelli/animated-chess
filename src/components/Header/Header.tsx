@@ -8,61 +8,46 @@ export const Header = () => {
   const moveCount = Math.floor(moveHistory.length / 2) + 1;
 
   return (
-    <header className="w-full bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900 shadow-lg border-b-4 border-amber-600">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo/Title */}
-          <div className="flex items-center gap-3">
-            <div className="text-4xl">♔</div>
-            <div>
-              <h1 className="text-2xl font-bold text-amber-100">
-                Animated Chess
-              </h1>
-              <p className="text-xs text-amber-200">
-                Movimento #{moveCount}
-              </p>
-            </div>
-          </div>
+    <header className="w-full bg-gradient-to-r from-amber-950/90 via-stone-900/90 to-amber-950/90 backdrop-blur-sm border-b-2 border-amber-700/40">
+      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+        {/* Turn Indicator - Compact */}
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-5 h-5 rounded-full border-2 ${
+              turn === "white"
+                ? "bg-white border-amber-500 shadow-lg shadow-amber-500/50"
+                : "bg-gray-400 border-stone-600"
+            }`}
+          />
+          <span className="text-sm font-bold text-amber-200">
+            {turn === "white" ? "Brancas" : "Pretas"}
+          </span>
+          <div
+            className={`w-5 h-5 rounded-full border-2 ${
+              turn === "black"
+                ? "bg-gray-900 border-amber-500 shadow-lg shadow-amber-500/50"
+                : "bg-gray-700 border-stone-600"
+            }`}
+          />
+          {isInCheck && (
+            <span className="text-xs text-red-400 font-semibold animate-pulse">
+              ⚠️ XEQUE
+            </span>
+          )}
+        </div>
 
-          {/* Turn Indicator */}
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-center px-6 py-2 bg-amber-950/50 rounded-lg border-2 border-amber-600">
-              <span className="text-xs text-amber-300 mb-1">Turno</span>
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-6 h-6 rounded-full border-2 ${
-                    turn === "white"
-                      ? "bg-white border-yellow-400 shadow-lg shadow-yellow-400/50"
-                      : "bg-gray-300 border-gray-400"
-                  }`}
-                />
-                <span className="text-lg font-bold text-amber-100">
-                  {turn === "white" ? "Brancas" : "Pretas"}
-                </span>
-                <div
-                  className={`w-6 h-6 rounded-full border-2 ${
-                    turn === "black"
-                      ? "bg-gray-900 border-yellow-400 shadow-lg shadow-yellow-400/50"
-                      : "bg-gray-700 border-gray-600"
-                  }`}
-                />
-              </div>
-              {isInCheck && (
-                <span className="text-xs text-red-400 mt-1 font-semibold animate-pulse">
-                  ⚠️ XEQUE!
-                </span>
-              )}
-            </div>
-
-            {/* Reset Button */}
-            <button
-              onClick={resetGame}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
-              title="Novo Jogo"
-            >
-              🔄 Novo Jogo
-            </button>
-          </div>
+        {/* Move count and Reset */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-amber-400/90">
+            Movimento #{moveCount}
+          </span>
+          <button
+            onClick={resetGame}
+            className="px-3 py-1 bg-amber-900/70 hover:bg-amber-800/90 text-amber-100 text-sm font-semibold rounded border-2 border-amber-700/60 transition-all duration-200 active:scale-95 shadow-md hover:shadow-lg"
+            title="Novo Jogo"
+          >
+            🔄 Novo Jogo
+          </button>
         </div>
       </div>
     </header>
