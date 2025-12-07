@@ -9,9 +9,7 @@ export default function Home() {
         <div className="w-screen h-screen flex flex-col overflow-hidden">
           <Header />
           <div className="flex-1 relative">
-            {/* Chessboard with battlefield background fills entire area */}
             <Chessboard />
-            {/* Move history floats on top */}
             <MoveHistory />
           </div>
           <GameOverModal />
