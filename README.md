@@ -113,6 +113,16 @@ npm run cypress:open # Abre interface do Cypress
 npm run cypress:run  # Executa testes Cypress (headless)
 ```
 
+## ☁️ Deploy na Vercel
+
+Este projeto está pronto para ser publicado na [Vercel](https://vercel.com/) utilizando a configuração incluída em `vercel.json`.
+
+1. Crie um novo projeto na Vercel e importe este repositório.
+2. Selecione **Root Directory** como a raiz do repositório (onde estão `package.json` e `next.config.ts`).
+3. Confirme os comandos sugeridos: `npm ci` para instalação e `npm run build` para o build de produção.
+4. Clique em **Deploy**. A Vercel usará a pasta `.next` gerada pelo build para servir o aplicativo.
+5. Para pré-visualizar localmente com o mesmo comportamento do deploy, utilize `npm run dev`.
+
 ## 🤝 Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para:
