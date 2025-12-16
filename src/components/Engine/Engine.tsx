@@ -31,20 +31,19 @@ export const Engine = ({ height, width }: EngineProps) => {
   const [dyingPieceId, setDyingPieceId] = useState<string | null>(null);
   const [dyingPiecePosition, setDyingPiecePosition] = useState<BasicCoords | null>(null);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [movingPieceId, setMovingPieceId] = useState<string | null>(null);
+
+  const addMoveRef = useRef(addMove);
+
+  useEffect(() => {
+    addMoveRef.current = addMove;
+  }, [addMove]);
 
   const BOARD_SIZE = 8;
   const cellSize = Math.min(width, height) / BOARD_SIZE;
   const offsetX = (width - BOARD_SIZE * cellSize) / 2;
   const offsetY = (height - BOARD_SIZE * cellSize) / 2;
   const previousPositions = useRef<Map<string, BasicCoords>>(new Map());
-
-  useEffect(() => {
-    const newPositions = new Map<string, BasicCoords>();
-    piecesInfo.forEach((piece) => {
-      newPositions.set(piece.id, { ...piece.coords });
-    });
-    previousPositions.current = newPositions;
-  }, [piecesInfo]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) =>
@@ -71,13 +70,14 @@ export const Engine = ({ height, width }: EngineProps) => {
     async (targetCoords: BasicCoords) => {
       if (!selectedPieceCoords || isAnimating) return;
 
+      setIsAnimating(true);
+
       // Create notation for the move
       const fromCol = String.fromCharCode(97 + selectedPieceCoords.coords.x!);
       const fromRow = 8 - selectedPieceCoords.coords.y!;
       const toCol = String.fromCharCode(97 + targetCoords.x!);
       const toRow = 8 - targetCoords.y!;
-      
-      
+
       const capturedPiece = piecesInfo.find(
         (p) =>
           p.coords.x === targetCoords.x &&
@@ -98,18 +98,20 @@ export const Engine = ({ height, width }: EngineProps) => {
       const captureSymbol = capturedPiece ? "x" : "";
       const notation = `${pieceSymbol}${fromCol}${fromRow}${captureSymbol}${toCol}${toRow}`;
 
-      addMove({
-        from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
-        to: { row: targetCoords.y!, col: targetCoords.x! },
-        piece: selectedPieceCoords.type,
-        captured: capturedPiece?.type,
-        notation,
-        timestamp: Date.now(),
-      });
-
       if (capturedPiece) {
-        setIsAnimating(true);
+        // Save color before clearing selection
+        const attackerColor = selectedPieceCoords.color;
+
+        // Clear selection/path immediately
+        setSelectedPieceCoords(null);
+        setPath([]);
+
+        // === PHASE 1: Move to target with walk animation and lateral offset ===
         setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
+        setMovingPieceId(selectedPieceCoords.id);
+
+        // Store previous position before updating state
+        previousPositions.current.set(selectedPieceCoords.id, { ...selectedPieceCoords.coords });
 
         setPiecesInfo((prev) =>
           prev.map((piece) =>
@@ -123,18 +125,20 @@ export const Engine = ({ height, width }: EngineProps) => {
           )
         );
 
-        setSelectedPieceCoords(null);
-        setPath([]);
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Walk animation duration
+        setMovingPieceId(null);
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // === PHASE 2: Battle animations (attack/hit/death) ===
+        await new Promise((resolve) => setTimeout(resolve, 150)); // Small pause
 
         setAttackingPieceId(selectedPieceCoords.id);
-        await new Promise(resolve => setTimeout(resolve, 750));
+        await new Promise((resolve) => setTimeout(resolve, 750)); // Attack animation
 
         setDyingPieceId(capturedPiece.id);
         setAttackingPieceId(null);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Death animation
 
+        // Check for king capture (game over)
         if (capturedPiece.type === "king") {
           setGameOver({
             over: true,
@@ -151,6 +155,7 @@ export const Engine = ({ height, width }: EngineProps) => {
           setPiecesInfo(defaultPiecesInfo);
           setDyingPieceId(null);
           setDyingPiecePosition(null);
+          setIsAnimating(false);
           return;
         }
 
@@ -165,25 +170,58 @@ export const Engine = ({ height, width }: EngineProps) => {
         setDyingPieceId(null);
         setDyingPiecePosition(null);
 
-        setTurn(GetNegativeColor(selectedPieceCoords.color));
+        // === PHASE 3: Add move to history (after all animations complete) ===
+        const moveData = {
+          from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
+          to: { row: targetCoords.y!, col: targetCoords.x! },
+          piece: selectedPieceCoords.type,
+          captured: capturedPiece.type,
+          notation,
+          timestamp: Date.now(),
+        };
+        addMoveRef.current(moveData);
+
+        setTurn(GetNegativeColor(attackerColor));
         setIsAnimating(false);
       } else {
+        // Simple move (no capture) - with walk animation
+        const attackerColor = selectedPieceCoords.color;
+        
+        setMovingPieceId(selectedPieceCoords.id);
+        
+        // Store previous position before updating state
+        previousPositions.current.set(selectedPieceCoords.id, { ...selectedPieceCoords.coords });
+
         setPiecesInfo((prev) =>
-          prev.map((piece) => {
-            if (piece.id === selectedPieceCoords.id) {
-              setTurn(GetNegativeColor(piece.color));
-              return {
-                ...piece,
-                coords: targetCoords,
-                ...(piece.type === "pawn" && { firstMove: false }),
-              };
-            }
-            return piece;
-          })
+          prev.map((piece) =>
+            piece.id === selectedPieceCoords.id
+              ? {
+                  ...piece,
+                  coords: targetCoords,
+                  ...(piece.type === "pawn" && { firstMove: false }),
+                }
+              : piece
+          )
         );
+
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Walk animation duration
+        setMovingPieceId(null);
+
+        // Add move to history after movement completes
+        const moveData = {
+          from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
+          to: { row: targetCoords.y!, col: targetCoords.x! },
+          piece: selectedPieceCoords.type,
+          notation,
+          timestamp: Date.now(),
+        };
+        addMoveRef.current(moveData);
 
         setSelectedPieceCoords(null);
         setPath([]);
+
+        setTurn(GetNegativeColor(attackerColor));
+        setIsAnimating(false);
       }
     },
     [
@@ -193,8 +231,8 @@ export const Engine = ({ height, width }: EngineProps) => {
       setPath,
       setGameOver,
       setTurn,
-      addMove,
       piecesInfo,
+      isAnimating,
     ]
   );
 
@@ -218,6 +256,7 @@ export const Engine = ({ height, width }: EngineProps) => {
             );
             const isYourTurn = piece.color === turn;
             const isAttacking = attackingPieceId === piece.id;
+            const isMoving = movingPieceId === piece.id;
 
             const handlePieceClick = () => {
               if (!isSelectable || !isYourTurn || isAnimating) return;
@@ -228,10 +267,17 @@ export const Engine = ({ height, width }: EngineProps) => {
               <motion.div
                 key={piece.id}
                 initial={{ x: initialX, y: initialY }}
-                animate={{ x: targetX, y: targetY }}
-                transition={{ type: "tween", duration: 0.3 }}
+                animate={{ 
+                  x: isAttacking ? targetX + 15 : targetX, // Lateral offset for attacker
+                  y: targetY 
+                }}
+                transition={{ type: "tween", duration: 0.5, ease: "linear" }}
                 className="absolute"
-                style={{ width: cellSize, height: cellSize }}
+                style={{ 
+                  width: cellSize, 
+                  height: cellSize,
+                  zIndex: isMoving || isAttacking ? 10 : 1,
+                }}
                 onClick={handlePieceClick}
               >
                 <ChessPiece
@@ -241,7 +287,7 @@ export const Engine = ({ height, width }: EngineProps) => {
                   color={piece.color}
                   isYourTurn={isYourTurn}
                   isAttacking={isAttacking}
-                  isMoving={false}
+                  isMoving={isMoving}
                   isHit={false}
                   isDead={!piece.alive}
                   isSelected={selectedPieceCoords?.id === piece.id}
@@ -262,6 +308,8 @@ export const Engine = ({ height, width }: EngineProps) => {
     setSelectedPieceCoords,
     attackingPieceId,
     dyingPieceId,
+    movingPieceId,
+    isAnimating,
   ]);
 
   const renderDyingPiece = useMemo(() => {
@@ -281,6 +329,7 @@ export const Engine = ({ height, width }: EngineProps) => {
           position: "absolute",
           width: cellSize,
           height: cellSize,
+          zIndex: 5,
         }}
       >
         <ChessPiece

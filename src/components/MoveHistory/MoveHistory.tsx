@@ -13,7 +13,6 @@ export const MoveHistory = () => {
     }
   }, [moveHistory]);
 
-  // Group moves by pairs (white and black)
   const movePairs = [];
   for (let i = 0; i < moveHistory.length; i += 2) {
     movePairs.push({
