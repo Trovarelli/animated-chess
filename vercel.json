@@ -4,10 +4,5 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "devCommand": "npm run dev",
-  "functions": {
-    "api/**": {
-      "maxDuration": 10
-    }
-  }
+  "devCommand": "npm run dev"
 }
