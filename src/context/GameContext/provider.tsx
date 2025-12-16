@@ -1,3 +1,4 @@
+"use client";
 import { useState, useCallback } from "react";
 import { GameContext } from "./contex";
 import { GameContextProviderProps, GameOverType, Move } from "./types";
@@ -32,7 +33,9 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
     setMoveHistory([]);
     setIsInCheck(false);
     // Trigger a custom event that components can listen to
-    window.dispatchEvent(new CustomEvent('resetGame'));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('resetGame'));
+    }
   }, []);
 
   return (

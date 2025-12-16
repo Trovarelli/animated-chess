@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useState } from "react";
 import { ChessboardContext } from "./contex";
 import { BasicCoords, ChessboardContextProviderProps } from "./types";
@@ -13,12 +14,16 @@ export const ChessboardContextProvider = ({
 
   const convertToChessCoords = ({ x, y }: BasicCoords) => {
     if (x === null || y === null) return "";
-    const alfabeticCoords = ["A", "B", "C", "D", "E", "F", "G", "H"][x];
+    const alfabeticCoords = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    if (x < 0 || x >= alfabeticCoords.length) return "";
+    const coord = alfabeticCoords[x];
+    if (!coord) return "";
     const numberCoords = 8 - y;
-    return `${alfabeticCoords}${numberCoords}`;
+    return `${coord}${numberCoords}`;
   };
 
   const convertFromChessCoords = (coords: string) => {
+    if (!coords || coords.length < 2) return { x: 0, y: 0 } as BasicCoords;
     const alfabeticCoords = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
     const x = alfabeticCoords.indexOf(coords[0]);

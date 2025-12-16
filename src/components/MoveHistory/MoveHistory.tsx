@@ -1,13 +1,7 @@
 "use client";
 import { useContext, useRef, useEffect, useMemo } from "react";
-import { GameContext, Move } from "@/context";
+import { GameContext } from "@/context";
 import { ChessPiece } from "@/components/ChessPiece";
-
-type MovePair = {
-  moveNumber: number;
-  white?: Move;
-  black?: Move;
-};
 
 export const MoveHistory = () => {
   const { moveHistory } = useContext(GameContext);
@@ -19,14 +13,17 @@ export const MoveHistory = () => {
     }
   }, [moveHistory]);
 
-  const movePairs = [];
-  for (let i = 0; i < moveHistory.length; i += 2) {
-    movePairs.push({
-      moveNumber: Math.floor(i / 2) + 1,
-      white: moveHistory[i],
-      black: moveHistory[i + 1],
-    });
-  }
+  const movePairs = useMemo(() => {
+    const pairs = [];
+    for (let i = 0; i < moveHistory.length; i += 2) {
+      pairs.push({
+        moveNumber: Math.floor(i / 2) + 1,
+        white: moveHistory[i],
+        black: moveHistory[i + 1],
+      });
+    }
+    return pairs;
+  }, [moveHistory]);
 
   return (
     <div className="absolute top-4 right-4 w-72 bg-gradient-to-b from-amber-950/80 via-stone-900/80 to-amber-950/80 backdrop-blur-md border-2 border-amber-700/60 rounded-lg shadow-2xl overflow-hidden z-10">

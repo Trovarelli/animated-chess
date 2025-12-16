@@ -233,7 +233,6 @@ export const Engine = ({ height, width }: EngineProps) => {
       setGameOver,
       setTurn,
       piecesInfo,
-      isAnimating,
     ]
   );
 

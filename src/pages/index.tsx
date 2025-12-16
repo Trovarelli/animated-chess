@@ -1,20 +1,9 @@
-import { Chessboard, Header, MoveHistory, GameOverModal } from "@/components";
-import { ChessboardContextProvider } from "@/context";
-import { GameContextProvider } from "@/context/GameContext";
+import dynamic from 'next/dynamic';
+
+const ChessGame = dynamic(() => import('@/components/ChessGame'), {
+  ssr: false,
+});
 
 export default function Home() {
-  return (
-    <GameContextProvider>
-      <ChessboardContextProvider>
-        <div className="w-screen h-screen flex flex-col overflow-hidden">
-          <Header />
-          <div className="flex-1 relative">
-            <Chessboard />
-            <MoveHistory />
-          </div>
-          <GameOverModal />
-        </div>
-      </ChessboardContextProvider>
-    </GameContextProvider>
-  );
+  return <ChessGame />;
 }
