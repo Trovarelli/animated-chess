@@ -226,6 +226,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     },
     [
       selectedPieceCoords,
+      isAnimating,
       setPiecesInfo,
       setSelectedPieceCoords,
       setPath,

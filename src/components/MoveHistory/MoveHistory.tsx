@@ -1,7 +1,13 @@
 "use client";
-import { useContext, useRef, useEffect } from "react";
-import { GameContext } from "@/context";
+import { useContext, useRef, useEffect, useMemo } from "react";
+import { GameContext, Move } from "@/context";
 import { ChessPiece } from "@/components/ChessPiece";
+
+type MovePair = {
+  moveNumber: number;
+  white?: Move;
+  black?: Move;
+};
 
 export const MoveHistory = () => {
   const { moveHistory } = useContext(GameContext);
@@ -63,7 +69,7 @@ export const MoveHistory = () => {
                           <ChessPiece
                             width={48}
                             height={48}
-                            type={pair.white.piece as any}
+                            type={pair.white.piece}
                             color="white"
                             isYourTurn={false}
                             isAttacking={false}
@@ -86,7 +92,7 @@ export const MoveHistory = () => {
                           <ChessPiece
                             width={48}
                             height={48}
-                            type={pair.black.piece as any}
+                            type={pair.black.piece}
                             color="black"
                             isYourTurn={false}
                             isAttacking={false}
