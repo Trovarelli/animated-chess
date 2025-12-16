@@ -188,6 +188,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     },
     [
       selectedPieceCoords,
+      isAnimating,
       setPiecesInfo,
       setSelectedPieceCoords,
       setPath,
@@ -262,6 +263,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     setSelectedPieceCoords,
     attackingPieceId,
     dyingPieceId,
+    isAnimating,
   ]);
 
   const renderDyingPiece = useMemo(() => {

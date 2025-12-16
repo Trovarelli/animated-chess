@@ -1,13 +1,14 @@
 import { Dispatch, JSX, SetStateAction } from "react";
+import { PiecesTypes } from "@/components/ChessPiece";
 
 export type Move = {
   from: { row: number; col: number };
   to: { row: number; col: number };
-  piece: string;
-  captured?: string;
+  piece: PiecesTypes;
+  captured?: PiecesTypes;
   notation: string;
   timestamp: number;
-}
+};
 
 export type GameOverType = {
   over: boolean;
