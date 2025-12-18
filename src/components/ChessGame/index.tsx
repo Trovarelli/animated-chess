@@ -1,4 +1,4 @@
-// import { Chessboard, Header, MoveHistory, GameOverModal } from "@/components";
+import { Header } from "@/components"; // Trying one by one
 import { ChessboardContextProvider } from "@/context";
 import { GameContextProvider } from "@/context/GameContext";
 
@@ -7,11 +7,11 @@ export default function ChessGame() {
     <GameContextProvider>
       <ChessboardContextProvider>
         <div className="w-screen h-screen flex flex-col overflow-hidden bg-blue-500">
+          <Header />
           <div className="p-10 text-white text-4xl">
-            Contexts Loaded. If you see this Blue screen, the problem is in the components (Chessboard, Header, etc).
+            Header Loaded. If you see this, Header is OK.
           </div>
-          {/* <Header />
-          <div className="flex-1 relative">
+          {/* <div className="flex-1 relative">
             <Chessboard />
             <MoveHistory />
           </div>
