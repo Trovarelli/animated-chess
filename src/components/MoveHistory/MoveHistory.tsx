@@ -1,7 +1,7 @@
 "use client";
 import { useContext, useRef, useEffect, useMemo } from "react";
-import { GameContext } from "@/context";
-import { ChessPiece } from "@/components/ChessPiece";
+import { GameContext } from "@/context/GameContext/context";
+import { ChessPiece } from "@/components/ChessPiece/ChessPiece";
 
 export const MoveHistory = () => {
   const { moveHistory } = useContext(GameContext);

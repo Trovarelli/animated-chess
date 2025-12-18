@@ -1,6 +1,6 @@
 "use client";
 import { useContext } from "react";
-import { GameContext } from "@/context";
+import { GameContext } from "@/context/GameContext/context";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const GameOverModal = () => {

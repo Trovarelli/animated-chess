@@ -1,4 +1,4 @@
-import { BasicCoords } from "@/context";
+import { BasicCoords } from "@/context/ChessboardContext/types";
 
 export type PiecesTypes =
   | "pawn"

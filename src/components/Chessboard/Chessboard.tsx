@@ -2,8 +2,8 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Engine } from "../Engine/Engine";
-import { ChessboardContext } from "@/context";
-import { ChessPiece } from "../ChessPiece";
+import { ChessboardContext } from "@/context/ChessboardContext/context";
+import { ChessPiece } from "../ChessPiece/ChessPiece";
 
 export const Chessboard = () => {
   const containerRef = useRef<HTMLDivElement>(null);

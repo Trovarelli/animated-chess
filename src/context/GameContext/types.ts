@@ -1,5 +1,5 @@
 import { Dispatch, JSX, SetStateAction } from "react";
-import { PiecesTypes } from "@/components/ChessPiece";
+import { PiecesTypes } from "@/components/ChessPiece/types";
 
 export type Move = {
   from: { row: number; col: number };
