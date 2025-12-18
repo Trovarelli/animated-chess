@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-import { GameContext } from "./contex";
+import { GameContext } from "./context";
 import { GameContextProviderProps, GameOverType, Move } from "./types";
 
 export const GameContextProvider = ({ children }: GameContextProviderProps) => {

@@ -1,8 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { ChessboardContext } from "./contex";
+import { ChessboardContext } from "./context";
 import { BasicCoords, ChessboardContextProviderProps } from "./types";
-import { defaultPiecesInfo, PiecesInfo } from "@/components";
+import { PiecesInfo } from "@/components/ChessPiece/types";
+import { defaultPiecesInfo } from "@/components/ChessPiece/defaultPositions";
 
 export const ChessboardContextProvider = ({
   children,
