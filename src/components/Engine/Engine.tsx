@@ -272,7 +272,7 @@ export const Engine = ({ height, width }: EngineProps) => {
                   y: targetY 
                 }}
                 transition={{ type: "tween", duration: 0.5, ease: "linear" }}
-                className="absolute select-none outline-none"
+                className="absolute select-none outline-none no-select"
                 style={{ 
                   width: cellSize, 
                   height: cellSize,
