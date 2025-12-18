@@ -9,11 +9,15 @@ export default function ChessGame() {
   return (
     <GameContextProvider>
       <ChessboardContextProvider>
-        <div className="w-screen h-screen flex flex-col overflow-hidden">
+        <div className="w-screen h-screen flex flex-col overflow-hidden bg-stone-950">
           <Header />
-          <div className="flex-1 relative">
-            <Chessboard />
-            <MoveHistory />
+          <div className="flex-1 flex flex-row overflow-hidden relative">
+            <div className="flex-1 relative overflow-hidden">
+               <Chessboard />
+            </div>
+            <div className="w-80 h-full border-l-2 border-amber-900/30 bg-stone-900/50 backdrop-blur-sm z-20">
+               <MoveHistory />
+            </div>
           </div>
           <GameOverModal />
         </div>

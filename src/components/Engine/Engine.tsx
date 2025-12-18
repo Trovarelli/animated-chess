@@ -348,36 +348,6 @@ export const Engine = ({ height, width }: EngineProps) => {
     );
   }, [dyingPieceId, dyingPiecePosition, piecesInfo, cellSize, offsetX, offsetY]);
 
-  const renderCoordinates = useMemo(() => {
-    return (
-      <>
-        {Array.from({ length: BOARD_SIZE }).map((_, i) => (
-          <React.Fragment key={i}>
-            <div
-              className="absolute text-sm text-white font-bold"
-              style={{
-                left: offsetX + i * cellSize + cellSize / 2,
-                top: offsetY + BOARD_SIZE * cellSize + 10,
-                transform: "translateX(-50%)",
-              }}
-            >
-              {String.fromCharCode(65 + i)}
-            </div>
-            <div
-              className="absolute text-white font-bold"
-              style={{
-                top: offsetY + i * cellSize + cellSize / 2,
-                left: offsetX - 20,
-                transform: "translateY(-50%)",
-              }}
-            >
-              {8 - i}
-            </div>
-          </React.Fragment>
-        ))}
-      </>
-    );
-  }, [cellSize, offsetX, offsetY]);
 
   return (
     <div className="relative" style={{ width, height }}>
@@ -393,7 +363,6 @@ export const Engine = ({ height, width }: EngineProps) => {
       />
       {renderPieces}
       {renderDyingPiece}
-      {renderCoordinates}
     </div>
   );
 };

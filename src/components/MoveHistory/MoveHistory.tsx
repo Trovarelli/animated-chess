@@ -26,7 +26,7 @@ export const MoveHistory = () => {
   }, [moveHistory]);
 
   return (
-    <div className="absolute top-4 right-4 w-72 bg-gradient-to-b from-amber-950/80 via-stone-900/80 to-amber-950/80 backdrop-blur-md border-2 border-amber-700/60 rounded-lg shadow-2xl overflow-hidden z-10">
+    <div className="w-full h-full flex flex-col bg-gradient-to-b from-amber-950/40 via-stone-900/40 to-amber-950/40 overflow-hidden shadow-xl">
       <div className="bg-amber-900/60 px-3 py-2 border-b-2 border-amber-700/50">
         <h2 className="text-sm font-bold text-amber-100 flex items-center gap-2">
           Histórico

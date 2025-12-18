@@ -44,20 +44,20 @@ export const Chessboard = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex justify-between items-center p-3 gap-3 bg-[url('/sprites/Board/BattleField-01.png')] bg-cover bg-center bg-no-repeat"
+      className="w-full h-full flex justify-center items-center p-8 gap-8 bg-[url('/sprites/Board/BattleField-01.png')] bg-cover bg-center bg-no-repeat"
     >
-      <div className="w-full h-full p-2 relative">
-        <div className="flex flex-wrap gap-2 content-start">
+      <div className="w-48 h-full flex flex-col justify-center items-end py-4">
+        <div className="flex flex-wrap-reverse gap-2 justify-end content-center opacity-80 hover:opacity-100 transition-opacity">
           {deadWhite.map((el, index) => (
             <motion.div
               key={el.id}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
             >
               <ChessPiece
-                width={cellSize}
-                height={cellSize}
+                width={cellSize * 0.7}
+                height={cellSize * 0.7}
                 type={el.type}
                 color={el.color}
                 isDead
@@ -68,7 +68,7 @@ export const Chessboard = () => {
       </div>
 
       {/* Chess board */}
-      <div className="relative p-4" style={{ overflow: "visible" }}>
+      <div className="relative shadow-[0_0_60px_rgba(0,0,0,0.5)] bg-black/20 rounded-lg p-6 backdrop-blur-[2px]" style={{ overflow: "visible" }}>
         <div
           className="relative"
           style={{
@@ -81,18 +81,19 @@ export const Chessboard = () => {
         </div>
       </div>
 
-      <div className="w-full h-full p-2 relative">
-        <div className="flex flex-wrap-reverse gap-2 content-start justify-end">
+      {/* Right Graveyard - Black pieces that died (playing for white) */}
+      <div className="w-48 h-full flex flex-col justify-center items-start py-4">
+        <div className="flex flex-wrap gap-2 justify-start content-center opacity-80 hover:opacity-100 transition-opacity">
           {deadBlack.map((el, index) => (
             <motion.div
               key={el.id}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
             >
               <ChessPiece
-                width={cellSize}
-                height={cellSize}
+                width={cellSize * 0.7}
+                height={cellSize * 0.7}
                 type={el.type}
                 color={el.color}
                 isDead
