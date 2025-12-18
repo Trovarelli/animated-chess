@@ -1,9 +1,20 @@
+import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+const ChessGame = dynamic(() => import('@/components/ChessGame'), {
+  ssr: false,
+});
+
 export default function Home() {
-  return (
-    <div style={{ color: 'red', fontSize: '50px', padding: '50px' }}>
-      Vercel Test: If you see this in Red, basic rendering works.
-    </div>
-  );
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return <div style={{ padding: '20px' }}>Loading environment...</div>;
+
+  return <ChessGame />;
 }
 
 export async function getServerSideProps() {
