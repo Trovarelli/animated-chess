@@ -1,4 +1,3 @@
-"use client";
 import { Chessboard, Header, MoveHistory, GameOverModal } from "@/components";
 import { ChessboardContextProvider } from "@/context";
 import { GameContextProvider } from "@/context/GameContext";
