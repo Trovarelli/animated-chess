@@ -7,3 +7,9 @@ const ChessGame = dynamic(() => import('@/components/ChessGame'), {
 export default function Home() {
   return <ChessGame />;
 }
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
