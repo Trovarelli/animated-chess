@@ -24,7 +24,7 @@ export const Board = ({
         (p) => p.coords.x === x && p.coords.y === y && p.color !== color
       );
 
-      const baseClasses = clsx("absolute", {
+      const baseClasses = clsx("absolute select-none outline-none", {
         "bg-white/10": isLight,
         "bg-black/10": !isLight,
         "cursor-pointer": isPath,
