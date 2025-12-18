@@ -1,8 +1,3 @@
 {
-  "version": 2,
-  "framework": "nextjs",
-  "installCommand": "npm ci",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "devCommand": "npm run dev"
+  "framework": "nextjs"
 }
