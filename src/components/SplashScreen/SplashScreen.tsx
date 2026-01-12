@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 interface SplashScreenProps {
@@ -23,10 +24,13 @@ export const SplashScreen = ({ onStart }: SplashScreenProps) => {
           transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
           className="flex flex-col items-center"
         >
-          <img
+          <Image
             src="/animated-chess.png"
             alt="Animated Chess Logo"
+            width={400}
+            height={160}
             className="h-48 w-auto object-contain drop-shadow-[0_0_30px_rgba(217,119,6,0.5)]"
+            priority
           />
           <motion.div
             initial={{ opacity: 0 }}
@@ -35,7 +39,7 @@ export const SplashScreen = ({ onStart }: SplashScreenProps) => {
             className="mt-4"
           >
             <span className="text-[10px] uppercase font-black tracking-[0.8em] text-stone-500 font-cinzel">
-              Grand Marshal's Edition
+              Grand Marshal&apos;s Edition
             </span>
           </motion.div>
         </motion.div>

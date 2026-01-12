@@ -1,5 +1,6 @@
 "use client";
 import { useContext } from "react";
+import Image from "next/image";
 import { GameContext } from "@/context/GameContext/context";
 
 export const Header = () => {
@@ -12,10 +13,13 @@ export const Header = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-10">
           <div className="flex items-center">
-            <img 
+            <Image 
               src="/animated-chess.png" 
               alt="Animated Chess Logo" 
+              width={200}
+              height={80}
               className="h-20 w-auto object-contain drop-shadow-[0_0_12px_rgba(217,119,6,0.4)] transition-transform duration-500 hover:scale-105"
+              priority
             />
           </div>
 

@@ -60,7 +60,7 @@ export const GameOverModal = () => {
           </div>
 
           <p className="text-stone-300 text-sm mb-10 font-bold uppercase tracking-widest px-8">
-            "{gameOver.winner.details}"
+            &quot;{gameOver.winner.details}&quot;
           </p>
 
           <div className="grid grid-cols-2 gap-4 mb-10">
