@@ -32,7 +32,6 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
     });
     setMoveHistory([]);
     setIsInCheck(false);
-    // Trigger a custom event that components can listen to
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('resetGame'));
     }

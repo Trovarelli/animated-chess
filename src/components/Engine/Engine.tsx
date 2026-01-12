@@ -72,7 +72,6 @@ export const Engine = ({ height, width }: EngineProps) => {
 
       setIsAnimating(true);
 
-      // Create notation for the move
       const fromCol = String.fromCharCode(97 + selectedPieceCoords.coords.x!);
       const fromRow = 8 - selectedPieceCoords.coords.y!;
       const toCol = String.fromCharCode(97 + targetCoords.x!);
@@ -85,7 +84,6 @@ export const Engine = ({ height, width }: EngineProps) => {
           p.color !== selectedPieceCoords.color
       );
 
-      // Standard chess notation symbols
       const pieceSymbols: Record<string, string> = {
         king: "K",
         queen: "Q",
@@ -99,18 +97,13 @@ export const Engine = ({ height, width }: EngineProps) => {
       const notation = `${pieceSymbol}${fromCol}${fromRow}${captureSymbol}${toCol}${toRow}`;
 
       if (capturedPiece) {
-        // Save color before clearing selection
         const attackerColor = selectedPieceCoords.color;
 
-        // Clear selection/path immediately
         setSelectedPieceCoords(null);
         setPath([]);
-
-        // === PHASE 1: Move to target with walk animation and lateral offset ===
         setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
         setMovingPieceId(selectedPieceCoords.id);
 
-        // Store previous position before updating state
         previousPositions.current.set(selectedPieceCoords.id, { ...selectedPieceCoords.coords });
 
         setPiecesInfo((prev) =>
@@ -125,20 +118,18 @@ export const Engine = ({ height, width }: EngineProps) => {
           )
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Walk animation duration
+        await new Promise((resolve) => setTimeout(resolve, 500));
         setMovingPieceId(null);
 
-        // === PHASE 2: Battle animations (attack/hit/death) ===
-        await new Promise((resolve) => setTimeout(resolve, 150)); // Small pause
+        await new Promise((resolve) => setTimeout(resolve, 150));
 
         setAttackingPieceId(selectedPieceCoords.id);
-        await new Promise((resolve) => setTimeout(resolve, 750)); // Attack animation
+        await new Promise((resolve) => setTimeout(resolve, 750));
 
         setDyingPieceId(capturedPiece.id);
         setAttackingPieceId(null);
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Death animation
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Check for king capture (game over)
         if (capturedPiece.type === "king") {
           setGameOver({
             over: true,
@@ -170,7 +161,6 @@ export const Engine = ({ height, width }: EngineProps) => {
         setDyingPieceId(null);
         setDyingPiecePosition(null);
 
-        // === PHASE 3: Add move to history (after all animations complete) ===
         const moveData = {
           from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
           to: { row: targetCoords.y!, col: targetCoords.x! },
@@ -184,12 +174,10 @@ export const Engine = ({ height, width }: EngineProps) => {
         setTurn(GetNegativeColor(attackerColor));
         setIsAnimating(false);
       } else {
-        // Simple move (no capture) - with walk animation
         const attackerColor = selectedPieceCoords.color;
         
         setMovingPieceId(selectedPieceCoords.id);
         
-        // Store previous position before updating state
         previousPositions.current.set(selectedPieceCoords.id, { ...selectedPieceCoords.coords });
 
         setPiecesInfo((prev) =>
@@ -204,10 +192,9 @@ export const Engine = ({ height, width }: EngineProps) => {
           )
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Walk animation duration
+        await new Promise((resolve) => setTimeout(resolve, 500));
         setMovingPieceId(null);
 
-        // Add move to history after movement completes
         const moveData = {
           from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
           to: { row: targetCoords.y!, col: targetCoords.x! },
@@ -240,7 +227,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     return (
       <AnimatePresence>
         {piecesInfo
-          .filter((p) => p.alive && p.id !== dyingPieceId) // Filter out dying piece
+          .filter((p) => p.alive && p.id !== dyingPieceId)
           .map((piece) => {
             const prevPos = previousPositions.current.get(piece.id);
             const targetX = offsetX + piece.coords.x! * cellSize;
@@ -268,7 +255,7 @@ export const Engine = ({ height, width }: EngineProps) => {
                 key={piece.id}
                 initial={{ x: initialX, y: initialY }}
                 animate={{ 
-                  x: isAttacking ? targetX + 15 : targetX, // Lateral offset for attacker
+                  x: isAttacking ? targetX + 15 : targetX,
                   y: targetY 
                 }}
                 transition={{ type: "tween", duration: 0.5, ease: "linear" }}

@@ -1,7 +1,6 @@
 import { PiecesInfo } from "./types";
 
 export const defaultPiecesInfo: PiecesInfo[] = [
-  // Peças pretas (linha 7 - peças maiores)
   {
     id: "black-rook-1",
     alive: true,
@@ -58,7 +57,6 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     color: 'black',
     coords: { x: 7, y: 7 },
   },
-  // Peões pretos (linha 6)
   {
     id: "black-pawn-1",
     alive: true,
@@ -123,8 +121,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     color: 'black',
     coords: { x: 7, y: 6 },
   },
-  
-  // Peças brancas (linha 0 - peças maiores)
+
   {
     id: "white-rook-1",
     alive: true,
@@ -181,7 +178,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     color: 'white',
     coords: { x: 7, y: 0 },
   },
-  // Peões brancos (linha 1)
+
   {
     id: "white-pawn-1",
     alive: true,
