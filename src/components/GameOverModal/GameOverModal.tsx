@@ -17,84 +17,77 @@ export const GameOverModal = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-950/90 backdrop-blur-xl"
         onClick={resetGame}
       >
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none opacity-20 ${winner === 'white' ? 'bg-white' : 'bg-amber-600'}`} />
+
         <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 50 }}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 50 }}
-          transition={{ type: "spring", duration: 0.5 }}
-          className="bg-gradient-to-br from-amber-900 to-amber-950 border-4 border-amber-600 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4"
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="relative bg-stone-900/40 border border-amber-500/30 rounded-sm shadow-[0_50px_100px_rgba(0,0,0,0.8)] p-12 max-w-lg w-full mx-4 text-center"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Trophy/Crown Icon */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+          
           <motion.div
-            initial={{ rotate: -180, scale: 0 }}
-            animate={{ rotate: 0, scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-            className="text-center mb-6"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
           >
-            <div className="text-8xl mb-2">
-              {winner === "white" ? "👑" : "🏆"}
-            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-stone-500 mb-2 block font-cinzel">
+              Conclusão de Operação
+            </span>
+            <h2 className="text-5xl font-black text-amber-500 uppercase tracking-widest font-cinzel mb-8">
+              Vitória das {winner === "white" ? "Brancas" : "Pretas"}!
+            </h2>
           </motion.div>
 
-          {/* Title */}
-          <h2 className="text-4xl font-bold text-center mb-4 text-amber-100">
-            Fim de Jogo!
-          </h2>
-
-          {/* Winner Declaration */}
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <div
-                className={`w-8 h-8 rounded-full border-4 ${
-                  winner === "white"
-                    ? "bg-white border-yellow-400"
-                    : "bg-gray-900 border-yellow-400"
-                }`}
-              />
-              <p className="text-2xl font-bold text-yellow-300">
-                {winner === "white" ? "Brancas" : "Pretas"} Venceram!
-              </p>
-            </div>
-            <p className="text-amber-200 text-sm mt-2">
-              {gameOver.winner.details}
-            </p>
-          </div>
-
-          {/* Game Stats */}
-          <div className="bg-amber-950/50 rounded-lg p-4 mb-6 border border-amber-700">
-            <h3 className="text-amber-300 font-semibold mb-2 text-center">
-              Estatísticas da Partida
-            </h3>
-            <div className="space-y-1 text-amber-100">
-              <div className="flex justify-between">
-                <span>Total de Movimentos:</span>
-                <span className="font-bold">{moveCount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Turnos:</span>
-                <span className="font-bold">{Math.ceil(moveCount / 2)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={resetGame}
-              className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
+          <div className="flex justify-center mb-10">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.4 }}
+              className="relative w-24 h-24 bg-stone-950/80 rounded-full border border-amber-500/30 flex items-center justify-center shadow-2xl"
             >
-              🔄 Jogar Novamente
-            </button>
+               <div className="text-5xl drop-shadow-[0_0_15px_rgba(217,119,6,0.5)]">
+                 {winner === "white" ? "👑" : "🏆"}
+               </div>
+               <div className="absolute inset-0 rounded-full border border-amber-500/10 animate-ping" />
+            </motion.div>
           </div>
 
-          {/* Close hint */}
-          <p className="text-center text-amber-400 text-xs mt-4">
-            Clique fora para fechar
+          <p className="text-stone-300 text-sm mb-10 font-bold uppercase tracking-widest px-8">
+            "{gameOver.winner.details}"
           </p>
+
+          <div className="grid grid-cols-2 gap-4 mb-10">
+             <div className="bg-stone-950/50 p-4 border border-stone-800">
+                <span className="text-[8px] font-black text-stone-500 uppercase tracking-widest mb-1 block">Sequências Totais</span>
+                <span className="text-2xl font-mono text-amber-500 font-bold">{moveCount.toString().padStart(2, '0')}</span>
+             </div>
+             <div className="bg-stone-950/50 p-4 border border-stone-800">
+                <span className="text-[8px] font-black text-stone-500 uppercase tracking-widest mb-1 block">Turnos de Combate</span>
+                <span className="text-2xl font-mono text-white font-bold">{Math.ceil(moveCount / 2).toString().padStart(2, '0')}</span>
+             </div>
+          </div>
+
+          <button
+            onClick={resetGame}
+            className="group relative w-full overflow-hidden bg-amber-500 py-4 rounded-sm transition-all duration-300 hover:bg-amber-600 active:scale-95"
+          >
+            <span className="relative text-xs font-black tracking-[0.3em] text-stone-950 font-cinzel">
+              NOVA OPERAÇÃO
+            </span>
+          </button>
+
+          <div className="mt-8 flex justify-center gap-1">
+             {[...Array(5)].map((_, i) => (
+               <div key={i} className="w-1 h-1 bg-stone-800 rounded-full" />
+             ))}
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
