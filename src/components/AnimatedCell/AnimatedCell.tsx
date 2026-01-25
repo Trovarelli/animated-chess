@@ -12,13 +12,10 @@ export const AnimatedCell = ({
   cellHeight,
   row,
   loop,
-  trimLeft,
-  trimRight,
-  trimTop,
-  trimBottom,
   displayWidth,
   displayHeight,
   style,
+  isFlipped,
 }: AnimatedCellProps) => {
   const {
     canvasRef,
@@ -34,10 +31,6 @@ export const AnimatedCell = ({
     frameHeight: cellHeight,
     row,
     loop,
-    trimLeft,
-    trimRight,
-    trimTop,
-    trimBottom,
     displayWidth,
     displayHeight,
   });
@@ -45,7 +38,11 @@ export const AnimatedCell = ({
   return (
     <div
       onClick={() => onClick && x != null && y != null && onClick({ x, y })}
-      style={style}
+      style={{
+        ...style,
+        transform: isFlipped ? `${style?.transform || ""} scaleX(-1)` : style?.transform,
+      }}
+      data-testid="move-indicator"
     >
       <canvas
         ref={canvasRef}

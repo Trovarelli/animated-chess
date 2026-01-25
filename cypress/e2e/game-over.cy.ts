@@ -2,6 +2,7 @@ describe('Game Over Scenarios', () => {
     beforeEach(() => {
         cy.visit('/');
         cy.wait(1000);
+        cy.contains('button', 'INICIAR JOGO').click();
     });
 
     it('should not show game over modal at game start', () => {

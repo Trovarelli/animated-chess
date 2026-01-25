@@ -20,6 +20,7 @@ export interface ChessPieceProps {
   isDead?: boolean;
   isSelected?: boolean;
   isYourTurn?: boolean;
+  isFlipped?: boolean;
 }
 
 export type PiecesInfo = {

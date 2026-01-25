@@ -8,7 +8,12 @@ export const ChessboardContext = createContext<ChessboardContextProps>({
   convertToChessCoords: () => "",
   convertFromChessCoords: () => ({ x: 0, y: 0 }),
   piecesInfo: defaultPiecesInfo,
-  setPiecesInfo: () => "",
+  setPiecesInfo: () => { },
   path: [],
-  setPath: () => ""
+  setPath: () => { },
+  enPassantTarget: null,
+  setEnPassantTarget: () => { },
+  isSquareUnderAttack: () => false,
+  calculateSafeMoves: () => [],
+  calculateRawPaths: () => [],
 });

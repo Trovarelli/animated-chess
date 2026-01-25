@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChessPieceProps } from "../types";
 
 export const useChessPieceState = ({
@@ -15,12 +15,6 @@ export const useChessPieceState = ({
     "idle" | "walk" | "attack" | "hit" | "death" | "selected"
   >(isDead ? "death" : "idle");
 
-  const timeoutToIdle = useCallback(() => {
-    setTimeout(() => {
-      setCurrentAnimation("idle");
-    }, 1000);
-  }, []);
-
   useEffect(() => {
     if (isDead) setCurrentAnimation("death");
     else if (isAttacking) setCurrentAnimation("attack");
@@ -28,9 +22,8 @@ export const useChessPieceState = ({
     else if (isHit) setCurrentAnimation("hit");
     else if (isSelected) {
       setCurrentAnimation("selected");
-      // timeoutToIdle();
     } else setCurrentAnimation("idle");
-  }, [isAttacking, isMoving, isHit, isDead, isSelected, timeoutToIdle]);
+  }, [isAttacking, isMoving, isHit, isDead, isSelected]);
 
   return currentAnimation;
 };

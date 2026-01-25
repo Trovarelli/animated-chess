@@ -1,5 +1,4 @@
 import { BasicCoords } from "@/context";
-import { TrimValue } from "@/hooks/useCanvasSprite";
 import { CSSProperties } from "react";
 
 export type AnimatedCellProps = {
@@ -11,13 +10,10 @@ export type AnimatedCellProps = {
   fps: number;
   row: number;
   loop: boolean;
-  style?: CSSProperties | undefined
+  style?: CSSProperties | undefined;
   cellWidth: number;
   cellHeight: number;
-  trimLeft?: TrimValue
-  trimRight?: TrimValue
-  trimTop?: TrimValue
-  trimBottom?: TrimValue
   displayWidth?: number;
   displayHeight?: number;
+  isFlipped?: boolean;
 };

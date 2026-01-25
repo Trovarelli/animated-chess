@@ -37,6 +37,11 @@ export const Board = ({
           key={`${x}-${y}`}
           onClick={() => isPath && handleSquareClick({ x, y } as BasicCoords)}
           className={baseClasses}
+          data-row={y}
+          data-col={x}
+          data-testid="square"
+          data-is-path={isPath}
+          data-has-enemy={hasEnemy}
           style={{
             width: cellSize,
             height: cellSize,

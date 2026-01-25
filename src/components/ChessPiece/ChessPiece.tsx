@@ -18,6 +18,7 @@ export const ChessPiece = ({
   height,
   isYourTurn,
   width,
+  isFlipped,
 }: ChessPieceProps) => {
   const currentAnimation = useChessPieceState({
     isAttacking,
@@ -40,9 +41,10 @@ export const ChessPiece = ({
       fps={fps}
       displayWidth={width}
       displayHeight={height}
+      isFlipped={isFlipped}
       style={{
         cursor: isYourTurn ? "pointer" : "default",
-        scale: 1.1,
+        scale: 1.6,
       }}
       row={row}
       loop={
@@ -52,10 +54,6 @@ export const ChessPiece = ({
       }
       cellWidth={FRAME_WIDTH}
       cellHeight={FRAME_HEIGHT}
-      trimLeft={20}
-      trimRight={20}
-      trimTop={18}
-      trimBottom={26}
     />
   );
 };

@@ -21,9 +21,9 @@ export default function ChessGame() {
             )}
           </AnimatePresence>
           
-          <div className="w-screen h-screen flex flex-col overflow-hidden bg-stone-950">
+          <div className="w-screen h-screen flex flex-col overflow-hidden bg-stone-950" data-testid="game-container">
             <Header />
-            <div className="flex-1 flex flex-row overflow-hidden relative">
+            <div className="flex-1 flex flex-row overflow-hidden relative" data-testid="chessboard-container">
               <div className="flex-1 relative overflow-hidden">
                  <Chessboard />
               </div>
