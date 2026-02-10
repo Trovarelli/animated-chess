@@ -2,14 +2,16 @@
 import { useContext } from "react";
 import { GameContext } from "@/context/GameContext/context";
 import { motion, AnimatePresence } from "framer-motion";
+import { getFactionLabel } from "@/utils/getFactionLabel";
 
 export const GameOverModal = () => {
-  const { gameOver, resetGame, moveHistory } = useContext(GameContext);
+  const { gameOver, resetGame, moveHistory, playerFaction } = useContext(GameContext);
 
   if (!gameOver.over) return null;
 
   const winner = gameOver.winner.color;
   const moveCount = moveHistory.length;
+  const winnerLabel = winner ? getFactionLabel(winner, playerFaction) : null;
 
   return (
     <AnimatePresence>
@@ -41,7 +43,7 @@ export const GameOverModal = () => {
               Conclusão de Operação
             </span>
             <h2 className="text-4xl font-black text-amber-500 uppercase tracking-widest font-cinzel mb-8">
-              Vitória dos {winner === "white" ? "Humanos" : "Orcs"}!
+              Vitória dos {winnerLabel?.name ?? "?"}!
             </h2>
           </motion.div>
 

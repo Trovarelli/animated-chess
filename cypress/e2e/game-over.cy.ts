@@ -2,7 +2,7 @@ describe('Game Over Scenarios', () => {
     beforeEach(() => {
         cy.visit('/');
         cy.wait(1000);
-        cy.contains('button', 'INICIAR JOGO').click();
+        cy.startGame('human');
     });
 
     it('should not show game over modal at game start', () => {
@@ -48,8 +48,7 @@ describe('Game Over Scenarios', () => {
     it('should maintain game state without premature game over', () => {
         cy.get('[style*="background-image"]').first().click({ force: true });
         cy.wait(300);
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(500);
+        cy.resetGame('human');
         cy.get('header').should('be.visible');
     });
 
@@ -65,14 +64,12 @@ describe('Game Over Scenarios', () => {
     it('should not crash when checking for game over conditions', () => {
         cy.get('[style*="background-image"]').first().click({ force: true });
         cy.wait(300);
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(500);
+        cy.resetGame('human');
         cy.get('header').should('be.visible');
     });
 
     it('should handle reset during potential check state', () => {
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(500);
+        cy.resetGame('human');
         cy.contains('XEQUE').should('not.exist');
     });
 
@@ -87,8 +84,7 @@ describe('Game Over Scenarios', () => {
     });
 
     it('should allow game to continue after reset', () => {
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(500);
+        cy.resetGame('human');
         cy.get('[style*="background-image"]').first().click({ force: true });
         cy.wait(300);
         cy.get('header').should('be.visible');

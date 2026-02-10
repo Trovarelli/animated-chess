@@ -2,7 +2,7 @@ describe('Chess Piece Movement', () => {
     beforeEach(() => {
         cy.visit('/');
         cy.wait(1000);
-        cy.contains('button', 'INICIAR JOGO').click();
+        cy.startGame('human');
     });
 
     it('should allow clicking on a white piece on first turn', () => {

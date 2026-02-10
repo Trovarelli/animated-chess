@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChessboardContext } from "@/context/ChessboardContext/context";
 import { GameContext } from "@/context/GameContext/context";
 import { ChessPiece } from "../ChessPiece/ChessPiece";
+import { getFactionLabel } from "@/utils/getFactionLabel";
 
 interface PlayerPanelProps {
   playerColor: "white" | "black";
@@ -12,8 +13,9 @@ interface PlayerPanelProps {
 
 export const PlayerPanel = ({ playerColor, className = "" }: PlayerPanelProps) => {
   const { piecesInfo } = useContext(ChessboardContext);
-  const { turn } = useContext(GameContext);
+  const { turn, playerFaction } = useContext(GameContext);
   const isTurn = turn === playerColor;
+  const factionLabel = getFactionLabel(playerColor, playerFaction);
 
   const capturedPieces = useMemo(() => {
     const enemyColor = playerColor === "white" ? "black" : "white";
@@ -69,10 +71,10 @@ export const PlayerPanel = ({ playerColor, className = "" }: PlayerPanelProps) =
             </motion.div>
             <div className="flex flex-col">
                 <span className={`text-xs font-bold uppercase tracking-widest transition-colors ${isTurn ? "text-amber-500" : "text-zinc-500"}`}>
-                    {playerColor === "white" ? "IMPÉRIO" : "CLÃ"}
+                    {factionLabel.title}
                 </span>
                 <h2 className={`text-xl font-cinzel font-black transition-colors ${isTurn ? "text-zinc-100" : "text-zinc-600"}`}>
-                    {playerColor === "white" ? "HUMANOS" : "ORCS"}
+                    {factionLabel.name}
                 </h2>
             </div>
         </div>

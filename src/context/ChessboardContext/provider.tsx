@@ -1,18 +1,25 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChessboardContext } from "./context";
 import { BasicCoords, ChessboardContextProviderProps, MappedCoords } from "./types";
 import { PiecesInfo } from "@/components/ChessPiece/types";
 import { defaultPiecesInfo } from "@/components/ChessPiece/defaultPositions";
+import { gameStorage } from "@/utils/gameStorage";
 
 export const ChessboardContextProvider = ({
   children,
 }: ChessboardContextProviderProps) => {
+  const savedState = useRef(gameStorage.load());
+
   const [selectedPieceCoords, setSelectedPieceCoords] =
     useState<PiecesInfo | null>(null);
-  const [piecesInfo, setPiecesInfo] = useState<PiecesInfo[]>(defaultPiecesInfo);
+  const [piecesInfo, setPiecesInfo] = useState<PiecesInfo[]>(
+    savedState.current?.piecesInfo?.length ? savedState.current.piecesInfo : defaultPiecesInfo
+  );
   const [path, setPath] = useState<BasicCoords[]>([]);
-  const [enPassantTarget, setEnPassantTarget] = useState<BasicCoords | null>(null);
+  const [enPassantTarget, setEnPassantTarget] = useState<BasicCoords | null>(
+    savedState.current?.enPassantTarget ?? null
+  );
 
   const convertToChessCoords = ({ x, y }: BasicCoords) => {
     if (x === null || y === null) return "";
@@ -41,7 +48,6 @@ export const ChessboardContextProvider = ({
       if (coords.x === null || coords.y === null) return false;
       const pieces = customPiecesInfo || piecesInfo;
 
-      // Check all pieces of the attacker color to see if they can move to this square
       return pieces
         .filter((p) => p.alive && p.color === attackerColor)
         .some((piece) => {
@@ -92,7 +98,6 @@ export const ChessboardContextProvider = ({
                   if (checkPos.x < 0 || checkPos.x > 7 || checkPos.y < 0 || checkPos.y > 7) break;
                   if (checkPos.x === coords.x && checkPos.y === coords.y) return true;
                   
-                  // Blocks if there's a piece
                   if (pieces.some(p => p.alive && p.coords.x === checkPos.x && p.coords.y === checkPos.y)) break;
                   step++;
                 }
@@ -114,10 +119,7 @@ export const ChessboardContextProvider = ({
           if (p.coords.x === target.x && p.coords.y === target.y && p.color !== piece.color) {
             return { ...p, alive: false, coords: { x: null, y: null } };
           }
-          // En Passant Simulation logic
           if (piece.type === 'pawn' && target.x !== piece.coords.x && !piecesInfo.some(ap => ap.alive && ap.coords.x === target.x && ap.coords.y === target.y)) {
-             // Correct logic: The victim is at {x: target.x, y: piece.coords.y}
-             // Ensure the victim is actually a Pawn and is an Enemy.
              if (p.coords.x === target.x && p.coords.y === piece.coords.y && p.type === 'pawn' && p.color !== piece.color) {
                return { ...p, alive: false, coords: { x: null, y: null } };
              }
@@ -185,10 +187,8 @@ export const ChessboardContextProvider = ({
             }
           });
 
-          // En Passant: Only add if this pawn is adjacent to the enemy pawn that just moved
           if (epTarget && epTarget.x !== null && epTarget.y !== null) {
             const targetRow = y + direction;
-            // Verify: 1) Target is in the right row, 2) Pawn is horizontally adjacent
             if (targetRow === epTarget.y && Math.abs(x - epTarget.x) === 1) {
               calculatedPaths.push(epTarget);
             }
@@ -289,6 +289,17 @@ export const ChessboardContextProvider = ({
       setPath([]);
     else handleSetPathForPiece(selectedPieceCoords);
   }, [handleSetPathForPiece, selectedPieceCoords]);
+
+  useEffect(() => {
+    const currentPersisted = gameStorage.load();
+    if (!currentPersisted?.playerFaction) return;
+
+    gameStorage.save({
+      ...currentPersisted,
+      piecesInfo,
+      enPassantTarget,
+    });
+  }, [piecesInfo, enPassantTarget]);
 
   return (
     <ChessboardContext.Provider

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import Image from "next/image";
 import { BoardProps } from "./types";
 import { BasicCoords } from "@/context";
 
@@ -59,10 +60,11 @@ export const Board = ({
         >
           {isPath && !hasEnemy && (
              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <img 
+                <Image 
                     src="/assets/mk/creepy_brackets_generated.png" 
                     alt="trail" 
-                    className="w-full h-full object-contain opacity-90 animate-pulse-aggressive"
+                    fill
+                    className="object-contain opacity-90 animate-pulse-aggressive"
                     style={{ imageRendering: "pixelated" }}
                 />
              </div>
@@ -71,10 +73,11 @@ export const Board = ({
           {isPath && hasEnemy && (
              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                  <div className="absolute inset-0 animate-reticle-pulse z-20">
-                    <img 
+                    <Image 
                         src="/assets/mk/aggressive_reticle_generated.png" 
                         alt="reticle" 
-                        className="w-full h-full object-fill drop-shadow-[0_0_8px_rgba(255,0,0,0.8)]"
+                        fill
+                        className="object-fill drop-shadow-[0_0_8px_rgba(255,0,0,0.8)]"
                         style={{ imageRendering: "pixelated" }}
                     />
                  </div>

@@ -1,6 +1,8 @@
 import { Dispatch, JSX, SetStateAction } from "react";
 import { PiecesTypes } from "@/components/ChessPiece/types";
 
+export type Faction = 'human' | 'orc';
+
 export type Move = {
   from: { row: number; col: number };
   to: { row: number; col: number };
@@ -31,6 +33,8 @@ export type GameContextProps = {
   addMove: (move: Move) => void;
   isInCheck: boolean;
   setIsInCheck: Dispatch<SetStateAction<boolean>>;
+  playerFaction: Faction | null;
+  setPlayerFaction: Dispatch<SetStateAction<Faction | null>>;
   resetGame: () => void;
 };
 

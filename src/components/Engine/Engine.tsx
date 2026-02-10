@@ -176,7 +176,6 @@ export const Engine = ({ height, width }: EngineProps) => {
       };
 
       if (capturedPiece) {
-        const attackerColor = selectedPieceCoords.color;
         const attackerId = selectedPieceCoords.id;
         const attackerPiece = { ...selectedPieceCoords };
         const targetId = capturedPiece.id;
@@ -249,7 +248,6 @@ export const Engine = ({ height, width }: EngineProps) => {
           }
         ]);
       } else {
-        const attackerColor = selectedPieceCoords.color;
         const attackerId = selectedPieceCoords.id;
         const attackerPiece = { ...selectedPieceCoords };
         const isPromotion = selectedPieceCoords.type === 'pawn' && (targetCoords.y === 0 || targetCoords.y === 7);
@@ -439,6 +437,8 @@ export const Engine = ({ height, width }: EngineProps) => {
     pieceOffsets,
     pieceFlipped,
     isAnimating,
+    handleSquareClick,
+    isInCheck,
   ]);
 
   const [shake, setShake] = useState(false);

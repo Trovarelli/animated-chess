@@ -16,7 +16,6 @@ export const ChessPiece = ({
   color,
   isSelected,
   height,
-  isYourTurn,
   width,
   isFlipped,
 }: ChessPieceProps) => {

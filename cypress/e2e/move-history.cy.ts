@@ -2,6 +2,7 @@ describe('Move History', () => {
     beforeEach(() => {
         cy.visit('/');
         cy.wait(1000);
+        cy.startGame('human');
     });
 
     it('should display initial move counter', () => {
@@ -25,8 +26,7 @@ describe('Move History', () => {
     });
 
     it('should reset move counter when game is reset', () => {
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(500);
+        cy.resetGame('human');
         cy.contains('Movimento #1').should('be.visible');
     });
 
@@ -44,10 +44,8 @@ describe('Move History', () => {
     });
 
     it('should maintain counter visibility after multiple resets', () => {
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(300);
-        cy.contains('button', 'Novo Jogo').click();
-        cy.wait(300);
+        cy.resetGame('human');
+        cy.resetGame('human');
         cy.contains('Movimento #1').should('be.visible');
     });
 

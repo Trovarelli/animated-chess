@@ -20,5 +20,8 @@ export const GameContext = createContext<GameContextProps>({
   addMove: () => { },
   isInCheck: false,
   setIsInCheck: () => { },
+  playerFaction: null,
+  setPlayerFaction: () => { },
   resetGame: () => { },
 });
+
