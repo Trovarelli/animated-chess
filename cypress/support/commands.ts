@@ -8,6 +8,7 @@ declare global {
             clickPiece(row: number, col: number): Chainable<void>;
             resetGame(): Chainable<void>;
             waitForAnimation(duration?: number): Chainable<void>;
+            waitForCaptureAnimation(): Chainable<void>;
         }
     }
 }
@@ -17,7 +18,6 @@ Cypress.Commands.add('getSquare', (row: number, col: number) => {
 });
 
 Cypress.Commands.add('clickSquare', (row: number, col: number) => {
-    // Wait for either the indicator div OR the capture indicator on the square
     cy.get(`[data-testid="square"][data-row="${row}"][data-col="${col}"]`, { timeout: 10000 })
         .should('satisfy', ($el) => {
             return $el.find('[data-testid="move-indicator"]').length > 0 || $el.attr('data-has-enemy') === 'true';
@@ -38,6 +38,10 @@ Cypress.Commands.add('resetGame', () => {
 
 Cypress.Commands.add('waitForAnimation', (duration: number = 1000) => {
     cy.wait(duration);
+});
+
+Cypress.Commands.add('waitForCaptureAnimation', () => {
+    cy.wait(3500);
 });
 
 export { };

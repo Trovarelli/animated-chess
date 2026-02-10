@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { BoardProps } from "./types";
 import { BasicCoords } from "@/context";
-import { AnimatedCell } from "@/components/AnimatedCell/AnimatedCell";
 
 export const Board = ({
   cellSize,
@@ -12,10 +11,19 @@ export const Board = ({
   offsetY,
   path,
   piecesInfo,
+  turn,
+  isInCheck,
 }: BoardProps) => {
-  return Array(BOARD_SIZE * BOARD_SIZE)
-    .fill(null)
-    .map((_, index) => {
+  return (
+    <div 
+        className="relative" 
+        data-turn={turn} 
+        data-is-check={isInCheck} 
+        data-testid="board-container"
+    >
+      {Array(BOARD_SIZE * BOARD_SIZE)
+        .fill(null)
+        .map((_, index) => {
       const x = index % BOARD_SIZE;
       const y = Math.floor(index / BOARD_SIZE);
       const isPath = path.some((p) => p.x === x && p.y === y);
@@ -24,19 +32,19 @@ export const Board = ({
         (p) => p.coords.x === x && p.coords.y === y && p.color !== color
       );
 
-      const baseClasses = clsx("absolute select-none outline-none no-select", {
-        "bg-white/10": isLight,
-        "bg-black/10": !isLight,
+      const baseClasses = clsx("absolute select-none outline-none no-select transition-colors duration-300", {
+        "bg-amber-900/10": isLight,
+        "bg-black/60": !isLight,
         "cursor-pointer": isPath,
-        "!bg-[url('/mark/base-mark.png')] bg-no-repeat bg-center cursor-pointer bg-contain animate-pulse duration-700 z-10":
-          isPath && hasEnemy,
       });
+
+      const highlightClass = "";
 
       return (
         <div
           key={`${x}-${y}`}
           onClick={() => isPath && handleSquareClick({ x, y } as BasicCoords)}
-          className={baseClasses}
+          className={`${baseClasses} ${highlightClass}`}
           data-row={y}
           data-col={x}
           data-testid="square"
@@ -50,26 +58,31 @@ export const Board = ({
           }}
         >
           {isPath && !hasEnemy && (
-            <AnimatedCell
-              sprite={"/flags/FlagRed.png"}
-              x={x as BasicCoords["x"]}
-              y={y as BasicCoords["y"]}
-              onClick={handleSquareClick}
-              frames={7}
-              fps={10}
-              displayWidth={cellSize}
-              displayHeight={cellSize}
-              row={0}
-              loop
-              cellWidth={64}
-              cellHeight={64}
-              style={{
-                scale: 0.5,
-                transform: "translate(25%)",
-              }}
-            />
+             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <img 
+                    src="/assets/mk/creepy_brackets_generated.png" 
+                    alt="trail" 
+                    className="w-full h-full object-contain opacity-90 animate-pulse-aggressive"
+                    style={{ imageRendering: "pixelated" }}
+                />
+             </div>
+          )}
+
+          {isPath && hasEnemy && (
+             <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                 <div className="absolute inset-0 animate-reticle-pulse z-20">
+                    <img 
+                        src="/assets/mk/aggressive_reticle_generated.png" 
+                        alt="reticle" 
+                        className="w-full h-full object-fill drop-shadow-[0_0_8px_rgba(255,0,0,0.8)]"
+                        style={{ imageRendering: "pixelated" }}
+                    />
+                 </div>
+             </div>
           )}
         </div>
-      );
-    });
+        );
+      })}
+    </div>
+  );
 };

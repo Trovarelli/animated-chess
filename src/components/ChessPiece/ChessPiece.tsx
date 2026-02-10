@@ -43,7 +43,7 @@ export const ChessPiece = ({
       displayHeight={height}
       isFlipped={isFlipped}
       style={{
-        cursor: isYourTurn ? "pointer" : "default",
+        pointerEvents: "none",
         scale: 1.6,
       }}
       row={row}

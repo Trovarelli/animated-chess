@@ -7,28 +7,28 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'rook',
     firstMove: true,
     color: 'black',
-    coords: { x: 0, y: 7 },
+    coords: { x: 0, y: 0 },
   },
   {
     id: "black-knight-1",
     alive: true,
     type: 'knight',
     color: 'black',
-    coords: { x: 1, y: 7 },
+    coords: { x: 1, y: 0 },
   },
   {
     id: "black-bishop-1",
     alive: true,
     type: 'bishop',
     color: 'black',
-    coords: { x: 2, y: 7 },
+    coords: { x: 2, y: 0 },
   },
   {
     id: "black-queen-1",
     alive: true,
     type: 'queen',
     color: 'black',
-    coords: { x: 3, y: 7 },
+    coords: { x: 3, y: 0 },
   },
   {
     id: "black-king-1",
@@ -36,21 +36,21 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'king',
     firstMove: true,
     color: 'black',
-    coords: { x: 4, y: 7 },
+    coords: { x: 4, y: 0 },
   },
   {
     id: "black-bishop-2",
     alive: true,
     type: 'bishop',
     color: 'black',
-    coords: { x: 5, y: 7 },
+    coords: { x: 5, y: 0 },
   },
   {
     id: "black-knight-2",
     alive: true,
     type: 'knight',
     color: 'black',
-    coords: { x: 6, y: 7 },
+    coords: { x: 6, y: 0 },
   },
   {
     id: "black-rook-2",
@@ -58,7 +58,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'rook',
     firstMove: true,
     color: 'black',
-    coords: { x: 7, y: 7 },
+    coords: { x: 7, y: 0 },
   },
   {
     id: "black-pawn-1",
@@ -66,7 +66,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 0, y: 6 },
+    coords: { x: 0, y: 1 },
   },
   {
     id: "black-pawn-2",
@@ -74,7 +74,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 1, y: 6 },
+    coords: { x: 1, y: 1 },
   },
   {
     id: "black-pawn-3",
@@ -82,7 +82,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 2, y: 6 },
+    coords: { x: 2, y: 1 },
   },
   {
     id: "black-pawn-4",
@@ -90,7 +90,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 3, y: 6 },
+    coords: { x: 3, y: 1 },
   },
   {
     id: "black-pawn-5",
@@ -98,7 +98,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 4, y: 6 },
+    coords: { x: 4, y: 1 },
   },
   {
     id: "black-pawn-6",
@@ -106,7 +106,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 5, y: 6 },
+    coords: { x: 5, y: 1 },
   },
   {
     id: "black-pawn-7",
@@ -114,7 +114,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 6, y: 6 },
+    coords: { x: 6, y: 1 },
   },
   {
     id: "black-pawn-8",
@@ -122,7 +122,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'black',
-    coords: { x: 7, y: 6 },
+    coords: { x: 7, y: 1 },
   },
 
   {
@@ -131,28 +131,28 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'rook',
     firstMove: true,
     color: 'white',
-    coords: { x: 0, y: 0 },
+    coords: { x: 0, y: 7 },
   },
   {
     id: "white-knight-1",
     alive: true,
     type: 'knight',
     color: 'white',
-    coords: { x: 1, y: 0 },
+    coords: { x: 1, y: 7 },
   },
   {
     id: "white-bishop-1",
     alive: true,
     type: 'bishop',
     color: 'white',
-    coords: { x: 2, y: 0 },
+    coords: { x: 2, y: 7 },
   },
   {
     id: "white-queen-1",
     alive: true,
     type: 'queen',
     color: 'white',
-    coords: { x: 3, y: 0 },
+    coords: { x: 3, y: 7 },
   },
   {
     id: "white-king-1",
@@ -160,21 +160,21 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'king',
     firstMove: true,
     color: 'white',
-    coords: { x: 4, y: 0 },
+    coords: { x: 4, y: 7 },
   },
   {
     id: "white-bishop-2",
     alive: true,
     type: 'bishop',
     color: 'white',
-    coords: { x: 5, y: 0 },
+    coords: { x: 5, y: 7 },
   },
   {
     id: "white-knight-2",
     alive: true,
     type: 'knight',
     color: 'white',
-    coords: { x: 6, y: 0 },
+    coords: { x: 6, y: 7 },
   },
   {
     id: "white-rook-2",
@@ -182,7 +182,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'rook',
     firstMove: true,
     color: 'white',
-    coords: { x: 7, y: 0 },
+    coords: { x: 7, y: 7 },
   },
   {
     id: "white-pawn-1",
@@ -190,7 +190,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 0, y: 1 },
+    coords: { x: 0, y: 6 },
   },
   {
     id: "white-pawn-2",
@@ -198,7 +198,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 1, y: 1 },
+    coords: { x: 1, y: 6 },
   },
   {
     id: "white-pawn-3",
@@ -206,7 +206,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 2, y: 1 },
+    coords: { x: 2, y: 6 },
   },
   {
     id: "white-pawn-4",
@@ -214,7 +214,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 3, y: 1 },
+    coords: { x: 3, y: 6 },
   },
   {
     id: "white-pawn-5",
@@ -222,7 +222,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 4, y: 1 },
+    coords: { x: 4, y: 6 },
   },
   {
     id: "white-pawn-6",
@@ -230,7 +230,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 5, y: 1 },
+    coords: { x: 5, y: 6 },
   },
   {
     id: "white-pawn-7",
@@ -238,7 +238,7 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 6, y: 1 },
+    coords: { x: 6, y: 6 },
   },
   {
     id: "white-pawn-8",
@@ -246,6 +246,6 @@ export const defaultPiecesInfo: PiecesInfo[] = [
     type: 'pawn',
     firstMove: true,
     color: 'white',
-    coords: { x: 7, y: 1 },
+    coords: { x: 7, y: 6 },
   },
 ];

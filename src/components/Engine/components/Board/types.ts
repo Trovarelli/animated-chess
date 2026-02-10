@@ -10,4 +10,8 @@ export type BoardProps = {
     color?: PiecesInfo['color'];
     handleSquareClick: (targetCoords: BasicCoords) => void;
     BOARD_SIZE: number;
-}
+    turn: "white" | "black" | null;
+    isInCheck: boolean;
+    lastMove?: { from: { col: number; row: number }; to: { col: number; row: number } };
+    selectedPieceCoords?: PiecesInfo | null;
+};

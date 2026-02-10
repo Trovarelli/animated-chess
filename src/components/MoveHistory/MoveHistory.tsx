@@ -9,7 +9,10 @@ export const MoveHistory = () => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   }, [moveHistory]);
 
@@ -82,9 +85,10 @@ export const MoveHistory = () => {
                             />
                           )}
                         </div>
-                        <span className="text-xs text-white font-mono font-bold tracking-tighter">
-                          {pair.white?.notation.substring(1) || "---"}
+                        <span className={`text-xs font-mono font-bold tracking-tighter ${pair.white?.notation.includes("x") ? "text-red-500" : "text-white"}`}>
+                          {pair.white ? (pair.white.notation.includes("x") ? "MASSACRE" : pair.white.notation.substring(1)) : "---"}
                         </span>
+                         {pair.white?.notation.includes("#") && <span className="text-[8px] bg-red-600 text-white px-1 rounded animate-pulse">FATALITY</span>}
                       </div>
                       
                       <div className={`flex items-center gap-3 flex-1 p-2 rounded-sm border ${pair.black ? 'bg-amber-500/5 border-amber-900/20' : 'bg-transparent border-dashed border-stone-800/40'}`}>
@@ -99,9 +103,10 @@ export const MoveHistory = () => {
                                 isDead={false}
                               />
                             </div>
-                            <span className="text-xs text-amber-500 font-mono font-bold tracking-tighter">
-                              {pair.black.notation.substring(1)}
+                            <span className={`text-xs font-mono font-bold tracking-tighter ${pair.black.notation.includes("x") ? "text-amber-600" : "text-amber-500"}`}>
+                              {pair.black.notation.includes("x") ? "SLAUGHTER" : pair.black.notation.substring(1)}
                             </span>
+                             {pair.black.notation.includes("#") && <span className="text-[8px] bg-red-600 text-white px-1 rounded animate-pulse">FATALITY</span>}
                           </>
                         ) : (
                           <div className="w-full flex justify-center py-1">

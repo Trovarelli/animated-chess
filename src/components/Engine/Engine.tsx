@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BasicCoords, ChessboardContext, MappedCoords } from "@/context";
-import { ChessPiece, defaultPiecesInfo } from "../ChessPiece";
+import { ChessPiece, defaultPiecesInfo, PiecesInfo } from "../ChessPiece";
 import { EngineProps } from "./types";
 import { GameContext } from "@/context/GameContext";
 import { GetNegativeColor } from "@/utils/GetNegativeColor";
@@ -30,7 +30,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     calculateRawPaths,
   } = useContext(ChessboardContext);
 
-  const { setTurn, turn, setGameOver, addMove, setIsInCheck } = useContext(GameContext);
+  const { setTurn, turn, setGameOver, addMove, setIsInCheck, isInCheck, moveHistory } = useContext(GameContext);
 
   const [attackingPieceId, setAttackingPieceId] = useState<string | null>(null);
   const [dyingPieceId, setDyingPieceId] = useState<string | null>(null);
@@ -83,12 +83,17 @@ export const Engine = ({ height, width }: EngineProps) => {
       const toCol = String.fromCharCode(97 + targetCoords.x!);
       const toRow = 8 - targetCoords.y!;
 
-      const capturedPiece = piecesInfo.find(
+      let capturedPiece = piecesInfo.find(
         (p) =>
           p.coords.x === targetCoords.x &&
           p.coords.y === targetCoords.y &&
           p.color !== selectedPieceCoords.color
       );
+
+      if (selectedPieceCoords.type === 'pawn' && enPassantTarget && targetCoords.x === enPassantTarget.x && targetCoords.y === enPassantTarget.y) {
+          const direction = selectedPieceCoords.color === 'white' ? -1 : 1;
+          capturedPiece = piecesInfo.find(p => p.coords.x === targetCoords.x && p.coords.y === targetCoords.y! - direction && p.color !== selectedPieceCoords.color);
+      }
 
       const pieceSymbols: Record<string, string> = {
         king: "K",
@@ -102,183 +107,33 @@ export const Engine = ({ height, width }: EngineProps) => {
       const captureSymbol = capturedPiece ? "x" : "";
       const notation = `${pieceSymbol}${fromCol}${fromRow}${captureSymbol}${toCol}${toRow}`;
 
-      if (capturedPiece) {
-        const attackerColor = selectedPieceCoords.color;
-        const attackerId = selectedPieceCoords.id;
-        const targetId = capturedPiece.id;
-
-        await runSequence([
-          {
-            // Step 1: Attacker moves to target square but slightly LEFT
-            action: () => {
-              setSelectedPieceCoords(null);
-              setPath([]);
-              setMovingPieceId(attackerId);
-              previousPositions.current.set(attackerId, { ...selectedPieceCoords.coords });
-              setPieceOffsets(prev => ({ ...prev, [attackerId]: { x: -25, y: 0 } }));
-              // Ensure attacker looks RIGHT (not flipped)
-              setPieceFlipped(prev => ({ ...prev, [attackerId]: false }));
-              setPiecesInfo((prev) =>
-                prev.map((p) =>
-                  p.id === attackerId
-                    ? { ...p, coords: targetCoords, firstMove: false }
-                    : p
-                )
-              );
-            },
-            duration: 600,
-          },
-          {
-            // Step 2: Target piece moves slightly RIGHT to give space
-            action: () => {
-              setMovingPieceId(null);
-              setPieceOffsets(prev => ({ ...prev, [targetId]: { x: 25, y: 0 } }));
-              // Target looks LEFT (flipped) to face attacker
-              setPieceFlipped(prev => ({ ...prev, [targetId]: true }));
-            },
-            duration: 400,
-          },
-          {
-            // Step 3: Attacker performs action of attack and moves to center
-            action: () => {
-              setAttackingPieceId(attackerId);
-              setPieceOffsets(prev => ({ ...prev, [attackerId]: { x: 0, y: 0 } }));
-            },
-            duration: 600,
-          },
-          {
-            // Step 4: Target plays HIT and then DEATH
-            action: () => {
-              setAttackingPieceId(null);
-              setDyingPieceId(targetId);
-              setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
-            },
-            duration: 1200,
-          },
-          {
-            // Final cleanup
-            action: () => {
-              setDyingPieceId(null);
-              setDyingPiecePosition(null);
-              setPieceOffsets({});
-              setPieceFlipped(prev => {
-                const next = { ...prev };
-                delete next[targetId]; // Clean up target flip
-                return next;
-              });
-              setPiecesInfo((prev) =>
-                prev.map((p) =>
-                  p.id === targetId
-                    ? { ...p, alive: false, coords: { x: null, y: null } }
-                    : p
-                )
-              );
-            },
-            duration: 0,
-          }
-        ]);
-
-        if (capturedPiece.type === "king") {
-          setGameOver({
-            over: true,
-            winner: {
-              color: GetNegativeColor(capturedPiece.color),
-              details: "Xeque-mate!",
-            },
-            looser: {
-              color: capturedPiece.color,
-              details: "Rei capturado",
-            },
-          });
-
-          setPiecesInfo(defaultPiecesInfo);
-          return;
-        }
-
-        setTurn(GetNegativeColor(attackerColor));
-      } else {
-
-        const attackerColor = selectedPieceCoords.color;
+      const completeMove = async (
+        piece: PiecesInfo,
+        nextPiecesInfo: PiecesInfo[],
+        nextEP: BasicCoords | null,
+        isPromotion: boolean,
+        target: BasicCoords
+      ) => {
+        const attackerColor = piece.color;
         const nextTurn = GetNegativeColor(attackerColor);
 
-        // Handle normal Pawn promotion logic (simplification for now)
-        const isPromotion = selectedPieceCoords.type === 'pawn' && (targetCoords.y === 0 || targetCoords.y === 7);
-        // TODO: Show promotion dialog. For now, just keep it as a pawn.
+        setPiecesInfo(nextPiecesInfo);
+        setEnPassantTarget(nextEP);
 
-        // Calculate new pieces state for checkmate detection
-        let nextPiecesInfo = piecesInfo.map((p) => {
-          if (p.id === selectedPieceCoords.id) {
-            return {
-              ...p,
-              coords: targetCoords,
-              firstMove: false,
-              ...(isPromotion && { type: 'queen' as const })
-            };
-          }
-          return p;
-        });
-
-        // Apply Castling to nextPiecesInfo
-        if (selectedPieceCoords.type === "king" && Math.abs(targetCoords.x! - (selectedPieceCoords.coords.x ?? 0)) === 2) {
-          const isKingside = targetCoords.x === 6;
-          const rookX = isKingside ? 7 : 0;
-          const rookTargetX = isKingside ? 5 : 3;
-          nextPiecesInfo = nextPiecesInfo.map(p =>
-            p.type === 'rook' && p.color === selectedPieceCoords.color && p.coords.x === rookX && p.coords.y === targetCoords.y
-              ? { ...p, coords: { x: rookTargetX as MappedCoords, y: targetCoords.y }, firstMove: false }
-              : p
-          );
-        }
-
-        // Apply En Passant to nextPiecesInfo
-        if (selectedPieceCoords.type === "pawn" && enPassantTarget && targetCoords.x === enPassantTarget.x && targetCoords.y === enPassantTarget.y) {
-          const capturedPawnY = selectedPieceCoords.coords.y;
-          nextPiecesInfo = nextPiecesInfo.map(p =>
-            p.type === 'pawn' && p.color !== selectedPieceCoords.color && p.coords.x === targetCoords.x && p.coords.y === capturedPawnY
-              ? { ...p, alive: false, coords: { x: null, y: null } }
-              : p
-          );
-        }
-
-        const nextEnPassantTarget = (selectedPieceCoords.type === 'pawn' && Math.abs(targetCoords.y! - (selectedPieceCoords.coords.y ?? 0)) === 2)
-          ? { x: targetCoords.x, y: ((targetCoords.y! + (selectedPieceCoords.coords.y ?? 0)) / 2) as MappedCoords }
-          : null;
-
-        await runSequence([
-          {
-            action: () => {
-              setMovingPieceId(selectedPieceCoords.id);
-              previousPositions.current.set(selectedPieceCoords.id, { ...selectedPieceCoords.coords });
-              
-              // Flip piece if moving left
-              if (targetCoords.x! < selectedPieceCoords.coords.x!) {
-                setPieceFlipped(prev => ({ ...prev, [selectedPieceCoords.id]: true }));
-              } else if (targetCoords.x! > selectedPieceCoords.coords.x!) {
-                setPieceFlipped(prev => ({ ...prev, [selectedPieceCoords.id]: false }));
-              }
-
-              setPiecesInfo(nextPiecesInfo);
-              setEnPassantTarget(nextEnPassantTarget);
-            },
-            duration: 500,
-          },
-          {
-            action: () => setMovingPieceId(null),
-            duration: 0,
-          },
-        ]);
-
-        // Check for Game Over (Checkmate / Stalemate) for nextTurn
         const nextPlayerPieces = nextPiecesInfo.filter(p => p.alive && p.color === nextTurn);
         const hasLegalMoves = nextPlayerPieces.some(p => {
-          const raw = calculateRawPaths(p, nextPiecesInfo, nextEnPassantTarget);
-          // We need a version of calculateSafeMoves that accepts custom pieces
-          // For now let's hope it uses the right state (it uses piecesInfo which is NOT updated yet)
-          // Actually let's just inline the logic or use updated state
-          return raw.some(target => {
+          const raw = calculateRawPaths(p, nextPiecesInfo, nextEP);
+          return raw.some(targetPos => {
             const tempPieces = nextPiecesInfo.map(tp => {
-              if (tp.id === p.id) return { ...tp, coords: target };
-              if (tp.coords.x === target.x && tp.coords.y === target.y && tp.color !== p.color) return { ...tp, alive: false, coords: { x: null, y: null } };
+              if (tp.id === p.id) return { ...tp, coords: targetPos };
+              if (tp.coords.x === targetPos.x && tp.coords.y === targetPos.y && tp.color !== p.color) 
+                  return { ...tp, alive: false, coords: { x: null, y: null } };
+              
+              if (p.type === 'pawn' && targetPos.x !== p.coords.x && !nextPiecesInfo.some(ap => ap.alive && ap.coords.x === targetPos.x && ap.coords.y === targetPos.y)) {
+                if (tp.coords.x === targetPos.x && tp.coords.y === p.coords.y && tp.type === 'pawn' && tp.color !== p.color) {
+                    return { ...tp, alive: false, coords: { x: null, y: null } };
+                }
+              }
               return tp;
             });
             const king = tempPieces.find(tp => tp.type === 'king' && tp.color === nextTurn && tp.alive);
@@ -307,9 +162,9 @@ export const Engine = ({ height, width }: EngineProps) => {
         }
 
         const moveData = {
-          from: { row: selectedPieceCoords.coords.y!, col: selectedPieceCoords.coords.x! },
-          to: { row: targetCoords.y!, col: targetCoords.x! },
-          piece: selectedPieceCoords.type,
+          from: { row: piece.coords.y!, col: piece.coords.x! },
+          to: { row: target.y!, col: target.x! },
+          piece: piece.type,
           notation: isPromotion ? notation + "=Q" : notation,
           timestamp: Date.now(),
         };
@@ -317,8 +172,150 @@ export const Engine = ({ height, width }: EngineProps) => {
 
         setSelectedPieceCoords(null);
         setPath([]);
-
         setTurn(nextTurn);
+      };
+
+      if (capturedPiece) {
+        const attackerColor = selectedPieceCoords.color;
+        const attackerId = selectedPieceCoords.id;
+        const attackerPiece = { ...selectedPieceCoords };
+        const targetId = capturedPiece.id;
+        const isPromotion = selectedPieceCoords.type === 'pawn' && (targetCoords.y === 0 || targetCoords.y === 7);
+
+        const nextPiecesInfoAfterCapture = piecesInfo.map((p) => {
+          if (p.id === attackerId) {
+            return { 
+                ...p, 
+                coords: targetCoords, 
+                firstMove: false,
+                ...(isPromotion && { type: 'queen' as const })
+              };
+          }
+          if (p.id === targetId) {
+            return { ...p, alive: false, coords: { x: null, y: null } };
+          }
+          return p;
+        });
+
+        await runSequence([
+          {
+            action: () => {
+              setSelectedPieceCoords(null);
+              setPath([]);
+              setMovingPieceId(attackerId);
+              previousPositions.current.set(attackerId, { ...attackerPiece.coords });
+              setPieceOffsets(prev => ({ ...prev, [attackerId]: { x: -25, y: 0 } }));
+              setPieceFlipped(prev => ({ ...prev, [attackerId]: false }));
+              setPiecesInfo(prev => prev.map(p => p.id === attackerId ? { ...p, coords: targetCoords, firstMove: false } : p));
+            },
+            duration: 600,
+          },
+          {
+            action: () => {
+              setMovingPieceId(null);
+              setPieceOffsets(prev => ({ ...prev, [targetId]: { x: 25, y: 0 } }));
+              setPieceFlipped(prev => ({ ...prev, [targetId]: true }));
+            },
+            duration: 400,
+          },
+          {
+            action: () => {
+              setAttackingPieceId(attackerId);
+              setPieceOffsets(prev => ({ ...prev, [attackerId]: { x: 0, y: 0 } }));
+            },
+            duration: 600,
+          },
+          {
+            action: () => {
+              setAttackingPieceId(null);
+              setDyingPieceId(targetId);
+              setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
+            },
+            duration: 1200,
+          },
+          {
+            action: () => {
+              setDyingPieceId(null);
+              setDyingPiecePosition(null);
+              setPieceOffsets({});
+              setPieceFlipped(prev => {
+                const next = { ...prev };
+                delete next[targetId];
+                return next;
+              });
+              completeMove(attackerPiece, nextPiecesInfoAfterCapture, null, isPromotion, targetCoords);
+            },
+            duration: 0,
+          }
+        ]);
+      } else {
+        const attackerColor = selectedPieceCoords.color;
+        const attackerId = selectedPieceCoords.id;
+        const attackerPiece = { ...selectedPieceCoords };
+        const isPromotion = selectedPieceCoords.type === 'pawn' && (targetCoords.y === 0 || targetCoords.y === 7);
+
+        let nextPiecesInfo = piecesInfo.map((p) => {
+          if (p.id === attackerId) {
+            return {
+              ...p,
+              coords: targetCoords,
+              firstMove: false,
+              ...(isPromotion && { type: 'queen' as const })
+            };
+          }
+          return p;
+        });
+
+        let castlingRookId: string | null = null;
+        if (attackerPiece.type === "king" && Math.abs(targetCoords.x! - (attackerPiece.coords.x ?? 0)) === 2) {
+          const isKingside = targetCoords.x === 6;
+          const rookX = isKingside ? 7 : 0;
+          const rookTargetX = isKingside ? 5 : 3;
+          
+          nextPiecesInfo = nextPiecesInfo.map(p => {
+            if (p.type === 'rook' && p.color === attackerPiece.color && p.coords.x === rookX && p.coords.y === targetCoords.y) {
+               castlingRookId = p.id;
+               return { ...p, coords: { x: rookTargetX as MappedCoords, y: targetCoords.y }, firstMove: false };
+            }
+            return p;
+          });
+        }
+        
+        const nextEnPassantTarget = (attackerPiece.type === 'pawn' && Math.abs(targetCoords.y! - (attackerPiece.coords.y ?? 0)) === 2)
+          ? { x: targetCoords.x, y: ((targetCoords.y! + (attackerPiece.coords.y ?? 0)) / 2) as MappedCoords }
+          : null;
+
+        await runSequence([
+          {
+            action: () => {
+              setSelectedPieceCoords(null);
+              setPath([]);
+              setMovingPieceId(attackerId);
+              previousPositions.current.set(attackerId, { ...attackerPiece.coords });
+              
+              if (castlingRookId) {
+                   const rookPiece = piecesInfo.find(p => p.id === castlingRookId);
+                   if (rookPiece) previousPositions.current.set(castlingRookId, { ...rookPiece.coords });
+              }
+
+              if (targetCoords.x! < attackerPiece.coords.x!) {
+                setPieceFlipped(prev => ({ ...prev, [attackerId]: true }));
+              } else if (targetCoords.x! > attackerPiece.coords.x!) {
+                setPieceFlipped(prev => ({ ...prev, [attackerId]: false }));
+              }
+              setPiecesInfo(nextPiecesInfo);
+              setEnPassantTarget(nextEnPassantTarget);
+            },
+            duration: 500,
+          },
+          {
+            action: () => {
+              setMovingPieceId(null);
+              completeMove(attackerPiece, nextPiecesInfo, nextEnPassantTarget, isPromotion, targetCoords);
+            },
+            duration: 0,
+          },
+        ]);
       }
     },
     [
@@ -363,10 +360,19 @@ export const Engine = ({ height, width }: EngineProps) => {
 
             const offset = pieceOffsets[piece.id] || { x: 0, y: 0 };
 
-            const handlePieceClick = () => {
-              if (!isSelectable || !isYourTurn || isAnimating.current) return;
-              setSelectedPieceCoords(piece);
+            const handlePieceClick = (e: React.MouseEvent) => {
+              e.stopPropagation();
+              if (isAnimating.current) return;
+              if (!isSelectable) {
+                handleSquareClick(piece.coords);
+                return;
+              }
+              if (isYourTurn) {
+                setSelectedPieceCoords(piece);
+              }
             };
+
+            const isKingInCheck = isInCheck && piece.type === 'king' && piece.color === turn;
 
             return (
               <motion.div
@@ -389,9 +395,17 @@ export const Engine = ({ height, width }: EngineProps) => {
                   width: cellSize, 
                   height: cellSize,
                   zIndex: isMoving || isAttacking ? 10 : 1,
+                  cursor: isYourTurn ? "pointer" : "default",
                 }}
-                onClick={handlePieceClick}
+                onClick={(e) => handlePieceClick(e)}
               >
+                {isKingInCheck && (
+                  <>
+                    <div className="absolute inset-0 z-[-1] rounded-full animate-ping bg-red-600/50 pointer-events-none mix-blend-screen" />
+                    <div className="absolute inset-0 z-[-1] rounded-full shadow-[0_0_30px_10px_rgba(220,38,38,0.6)] bg-red-500/20 pointer-events-none mix-blend-screen" />
+                  </>
+                )}
+
                 <ChessPiece
                   width={cellSize}
                   height={cellSize}
@@ -426,6 +440,39 @@ export const Engine = ({ height, width }: EngineProps) => {
     pieceFlipped,
     isAnimating,
   ]);
+
+  const [shake, setShake] = useState(false);
+  const [bloodParticles, setBloodParticles] = useState<{id: number, x: number, y: number}[]>([]);
+  
+  const triggerCaptureFX = useCallback((coords: BasicCoords) => {
+      setShake(true);
+      setTimeout(() => setShake(false), 300);
+
+      const newParticles = Array.from({ length: 12 }).map((_, i) => ({
+          id: Date.now() + i,
+          x: coords.x!,
+          y: coords.y!
+      }));
+      setBloodParticles(prev => [...prev, ...newParticles]);
+      
+      setTimeout(() => {
+          setBloodParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+      }, 1000);
+  }, []);
+
+  const prevHistoryLen = useRef(moveHistory.length);
+  useEffect(() => {
+      if (moveHistory.length > prevHistoryLen.current) {
+          const lastMove = moveHistory[moveHistory.length - 1];
+          if (lastMove.captured) { 
+              triggerCaptureFX({ 
+                x: lastMove.to.col as MappedCoords, 
+                y: lastMove.to.row as MappedCoords 
+              });
+          }
+          prevHistoryLen.current = moveHistory.length;
+      }
+  }, [moveHistory, triggerCaptureFX]);
 
   const renderDyingPiece = useMemo(() => {
     if (!dyingPieceId || !dyingPiecePosition) return null;
@@ -466,19 +513,40 @@ export const Engine = ({ height, width }: EngineProps) => {
     );
   }, [dyingPieceId, dyingPiecePosition, piecesInfo, cellSize, offsetX, offsetY, pieceOffsets, pieceFlipped]);
 
-
   return (
-    <div className="relative" style={{ width, height }}>
+    <div 
+      className={`relative select-none overflow-hidden ${shake ? "animate-shake" : ""}`} 
+      style={{ width, height, contain: 'layout paint' }}
+    >
+      <AnimatePresence>
+        {bloodParticles.map((p) => (
+             <motion.div
+                key={p.id}
+                initial={{ x: offsetX + p.x * cellSize + cellSize/2, y: offsetY + p.y * cellSize + cellSize/2, scale: 0, opacity: 1 }}
+                animate={{ 
+                    x: offsetX + p.x * cellSize + cellSize/2 + (Math.random() - 0.5) * 150, 
+                    y: offsetY + p.y * cellSize + cellSize/2 + (Math.random() - 0.5) * 150, 
+                    scale: [1, 2, 0], 
+                    opacity: 0 
+                }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="absolute w-2 h-2 bg-red-600 rounded-full z-50 pointer-events-none"
+             />
+        ))}
+      </AnimatePresence>
       <Board
-        path={path}
-        piecesInfo={piecesInfo}
-        cellSize={cellSize}
-        offsetX={offsetX}
-        offsetY={offsetY}
-        color={selectedPieceCoords?.color}
-        handleSquareClick={handleSquareClick}
-        BOARD_SIZE={BOARD_SIZE}
-      />
+          BOARD_SIZE={BOARD_SIZE}
+          cellSize={cellSize}
+          handleSquareClick={handleSquareClick}
+          offsetX={offsetX}
+          offsetY={offsetY}
+          path={path}
+          piecesInfo={piecesInfo}
+          turn={turn}
+          isInCheck={isInCheck}
+          lastMove={moveHistory[moveHistory.length - 1]}
+          selectedPieceCoords={selectedPieceCoords}
+        />
       {renderPieces}
       {renderDyingPiece}
     </div>

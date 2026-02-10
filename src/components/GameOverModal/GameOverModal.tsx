@@ -40,8 +40,8 @@ export const GameOverModal = () => {
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-stone-500 mb-2 block font-cinzel">
               Conclusão de Operação
             </span>
-            <h2 className="text-5xl font-black text-amber-500 uppercase tracking-widest font-cinzel mb-8">
-              Vitória das {winner === "white" ? "Brancas" : "Pretas"}!
+            <h2 className="text-4xl font-black text-amber-500 uppercase tracking-widest font-cinzel mb-8">
+              Vitória dos {winner === "white" ? "Humanos" : "Orcs"}!
             </h2>
           </motion.div>
 
@@ -52,8 +52,19 @@ export const GameOverModal = () => {
               transition={{ type: "spring", delay: 0.4 }}
               className="relative w-24 h-24 bg-stone-950/80 rounded-full border border-amber-500/30 flex items-center justify-center shadow-2xl"
             >
-               <div className="text-5xl drop-shadow-[0_0_15px_rgba(217,119,6,0.5)]">
-                 {winner === "white" ? "👑" : "🏆"}
+               <div className="text-5xl drop-shadow-[0_0_15px_rgba(217,119,6,0.5)] flex items-center justify-center w-full h-full">
+                 {winner === "white" ? (
+                    <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-amber-500">
+                        <path d="M12 2L3 5V11C3 16.55 6.4 21.74 12 23C17.6 21.74 21 16.55 21 11V5L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="rgba(245, 158, 11, 0.2)"/>
+                        <path d="M12 18V6M9 9L12 6L15 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                 ) : (
+                    <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-amber-500">
+                        <path d="M21 3L3 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M16 2C16 2 20 2 22 4C24 6 24 10 24 10L20 12L18 10L17 8L16 2Z" fill="rgba(245, 158, 11, 0.2)" stroke="currentColor"/>
+                        <path d="M6 12C6 12 2 12 0 10C-2 8 -2 4 -2 4L2 2L4 4L5 6L6 12Z" fill="rgba(245, 158, 11, 0.2)" stroke="currentColor"/>
+                    </svg>
+                 )}
                </div>
                <div className="absolute inset-0 rounded-full border border-amber-500/10 animate-ping" />
             </motion.div>
