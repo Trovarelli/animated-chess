@@ -18,10 +18,14 @@ export const GameContext = createContext<GameContextProps>({
   setGameOver: () => { },
   moveHistory: [],
   addMove: () => { },
+  uciMoveHistory: [],
+  addUciMove: () => { },
   isInCheck: false,
   setIsInCheck: () => { },
   playerFaction: null,
   setPlayerFaction: () => { },
+  aiDifficulty: 10,
+  setAiDifficulty: () => { },
   resetGame: () => { },
 });
 

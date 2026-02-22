@@ -10,8 +10,10 @@ export interface PersistedGameState {
     isInCheck: boolean;
     gameOver: GameOverType;
     playerFaction: Faction;
+    aiDifficulty: number;
     piecesInfo: PiecesInfo[];
     enPassantTarget: BasicCoords | null;
+    uciMoveHistory?: string[];
 }
 
 export const gameStorage = {

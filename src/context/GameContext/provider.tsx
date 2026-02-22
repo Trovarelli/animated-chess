@@ -28,17 +28,29 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const [playerFaction, setPlayerFaction] = useState<Faction | null>(
     savedState.current?.playerFaction ?? null
   );
+  const [aiDifficulty, setAiDifficulty] = useState<number>(
+    savedState.current?.aiDifficulty ?? 10
+  );
+  const [uciMoveHistory, setUciMoveHistory] = useState<string[]>(
+    savedState.current?.uciMoveHistory ?? []
+  );
 
   const addMove = useCallback((move: Move) => {
     setMoveHistory(prev => [...prev, move]);
+  }, []);
+
+  const addUciMove = useCallback((uciMove: string) => {
+    setUciMoveHistory(prev => [...prev, uciMove]);
   }, []);
 
   const resetGame = useCallback(() => {
     setTurn("white");
     setGameOver(defaultGameOver);
     setMoveHistory([]);
+    setUciMoveHistory([]);
     setIsInCheck(false);
     setPlayerFaction(null);
+    setAiDifficulty(10);
     gameStorage.clear();
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('resetGame'));
@@ -55,10 +67,12 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
       isInCheck,
       gameOver,
       playerFaction,
+      aiDifficulty,
+      uciMoveHistory,
       piecesInfo: currentPersisted?.piecesInfo ?? [],
       enPassantTarget: currentPersisted?.enPassantTarget ?? null,
     });
-  }, [turn, moveHistory, isInCheck, gameOver, playerFaction]);
+  }, [turn, moveHistory, isInCheck, gameOver, playerFaction, aiDifficulty, uciMoveHistory]);
 
   return (
     <GameContext.Provider
@@ -69,10 +83,14 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
         setGameOver,
         moveHistory,
         addMove,
+        uciMoveHistory,
+        addUciMove,
         isInCheck,
         setIsInCheck,
         playerFaction,
         setPlayerFaction,
+        aiDifficulty,
+        setAiDifficulty,
         resetGame,
       }}
     >

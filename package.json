@@ -18,7 +18,8 @@
     "next": "^15.1.8",
     "pngjs": "^7.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "stockfish": "^17.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

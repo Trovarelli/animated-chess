@@ -12,7 +12,7 @@ import { GameContext } from "@/context/GameContext/context";
 import { Faction } from "@/context/GameContext/types";
 
 const ChessGameInner = () => {
-  const { playerFaction, setPlayerFaction } = useContext(GameContext);
+  const { playerFaction, setPlayerFaction, setAiDifficulty } = useContext(GameContext);
   const [showSplash, setShowSplash] = useState(!playerFaction);
 
   useEffect(() => {
@@ -21,8 +21,9 @@ const ChessGameInner = () => {
     return () => window.removeEventListener('resetGame', handleReset);
   }, []);
 
-  const handleStart = (faction: Faction) => {
+  const handleStart = (faction: Faction, difficulty: number) => {
     setPlayerFaction(faction);
+    setAiDifficulty(difficulty);
     setShowSplash(false);
   };
 

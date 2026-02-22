@@ -14,7 +14,8 @@ import { EngineProps } from "./types";
 import { GameContext } from "@/context/GameContext";
 import { GetNegativeColor } from "@/utils/GetNegativeColor";
 import { Board } from "./components/Board/Board";
-import { useAnimationSequence } from "@/hooks";
+import { useAnimationSequence, useStockfish } from "@/hooks";
+import { coordsToUci } from "@/utils/uciConverter";
 
 export const Engine = ({ height, width }: EngineProps) => {
   const {
@@ -30,7 +31,7 @@ export const Engine = ({ height, width }: EngineProps) => {
     calculateRawPaths,
   } = useContext(ChessboardContext);
 
-  const { setTurn, turn, setGameOver, addMove, setIsInCheck, isInCheck, moveHistory } = useContext(GameContext);
+  const { setTurn, turn, setGameOver, addMove, addUciMove, setIsInCheck, isInCheck, moveHistory, playerFaction } = useContext(GameContext);
 
   const [attackingPieceId, setAttackingPieceId] = useState<string | null>(null);
   const [dyingPieceId, setDyingPieceId] = useState<string | null>(null);
@@ -41,16 +42,22 @@ export const Engine = ({ height, width }: EngineProps) => {
   const [pieceFlipped, setPieceFlipped] = useState<Record<string, boolean>>({});
 
   const addMoveRef = useRef(addMove);
+  const addUciMoveRef = useRef(addUciMove);
 
   useEffect(() => {
     addMoveRef.current = addMove;
-  }, [addMove]);
+    addUciMoveRef.current = addUciMove;
+  }, [addMove, addUciMove]);
 
   const BOARD_SIZE = 8;
   const cellSize = Math.min(width, height) / BOARD_SIZE;
   const offsetX = (width - BOARD_SIZE * cellSize) / 2;
   const offsetY = (height - BOARD_SIZE * cellSize) / 2;
   const previousPositions = useRef<Map<string, BasicCoords>>(new Map());
+
+  const { aiMove, consumeAiMove, isThinking, isAiTurn, aiColor } = useStockfish();
+  const handleSquareClickRef = useRef<((coords: BasicCoords) => void) | null>(null);
+  const pendingAiMoveRef = useRef<BasicCoords | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) =>
@@ -74,9 +81,45 @@ export const Engine = ({ height, width }: EngineProps) => {
     return () => window.removeEventListener('resetGame', handleResetGame);
   }, [setPiecesInfo, setSelectedPieceCoords, setPath]);
 
+  useEffect(() => {
+    if (!aiMove || !isAiTurn) return;
+
+    const piece = piecesInfo.find(
+      p => p.alive && p.coords.x === aiMove.from.x && p.coords.y === aiMove.from.y && p.color === aiColor
+    );
+    if (!piece) return;
+
+    const move = consumeAiMove();
+    if (!move) return;
+
+    const rawPaths = calculateRawPaths(piece, piecesInfo, enPassantTarget);
+    const validPaths = rawPaths.filter(targetPos => {
+      const tempPieces = piecesInfo.map(tp => {
+        if (tp.id === piece.id) return { ...tp, coords: targetPos };
+        if (tp.coords.x === targetPos.x && tp.coords.y === targetPos.y && tp.color !== piece.color)
+          return { ...tp, alive: false, coords: { x: null, y: null } };
+        return tp;
+      });
+      const king = tempPieces.find(tp => tp.type === 'king' && tp.color === piece.color && tp.alive);
+      if (!king) return false;
+      return !isSquareUnderAttack(king.coords, GetNegativeColor(piece.color)!, tempPieces);
+    });
+
+    const isValidTarget = validPaths.some(p => p.x === move.to.x && p.y === move.to.y);
+    if (!isValidTarget) {
+      return;
+    }
+
+    pendingAiMoveRef.current = move.to;
+    setSelectedPieceCoords(piece);
+    setPath(validPaths);
+  }, [aiMove, isAiTurn, aiColor, piecesInfo, consumeAiMove, setSelectedPieceCoords, calculateRawPaths, enPassantTarget, isSquareUnderAttack, setPath]);
+
+
+
   const handleSquareClick = useCallback(
     async (targetCoords: BasicCoords) => {
-      if (!selectedPieceCoords || isAnimating.current) return;
+      if (!selectedPieceCoords) return;
 
       const fromCol = String.fromCharCode(97 + selectedPieceCoords.coords.x!);
       const fromRow = 8 - selectedPieceCoords.coords.y!;
@@ -116,9 +159,6 @@ export const Engine = ({ height, width }: EngineProps) => {
       ) => {
         const attackerColor = piece.color;
         const nextTurn = GetNegativeColor(attackerColor);
-
-        setPiecesInfo(nextPiecesInfo);
-        setEnPassantTarget(nextEP);
 
         const nextPlayerPieces = nextPiecesInfo.filter(p => p.alive && p.color === nextTurn);
         const hasLegalMoves = nextPlayerPieces.some(p => {
@@ -169,10 +209,6 @@ export const Engine = ({ height, width }: EngineProps) => {
           timestamp: Date.now(),
         };
         addMoveRef.current(moveData);
-
-        setSelectedPieceCoords(null);
-        setPath([]);
-        setTurn(nextTurn);
       };
 
       if (capturedPiece) {
@@ -205,7 +241,21 @@ export const Engine = ({ height, width }: EngineProps) => {
               previousPositions.current.set(attackerId, { ...attackerPiece.coords });
               setPieceOffsets(prev => ({ ...prev, [attackerId]: { x: -25, y: 0 } }));
               setPieceFlipped(prev => ({ ...prev, [attackerId]: false }));
-              setPiecesInfo(prev => prev.map(p => p.id === attackerId ? { ...p, coords: targetCoords, firstMove: false } : p));
+              setPiecesInfo(prev => prev.map(p => {
+                if (p.id === attackerId) return { ...p, coords: targetCoords, firstMove: false };
+                if (p.id === targetId) return { ...p, alive: false, coords: { x: null, y: null } };
+                return p;
+              }));
+              setDyingPieceId(targetId);
+              setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
+              setEnPassantTarget(null); 
+              const captureUci = coordsToUci(
+                attackerPiece.coords.x!, attackerPiece.coords.y!,
+                targetCoords.x!, targetCoords.y!,
+                isPromotion ? 'q' : undefined
+              );
+              addUciMoveRef.current(captureUci);
+              setTurn(GetNegativeColor(attackerPiece.color));
             },
             duration: 600,
           },
@@ -227,8 +277,6 @@ export const Engine = ({ height, width }: EngineProps) => {
           {
             action: () => {
               setAttackingPieceId(null);
-              setDyingPieceId(targetId);
-              setDyingPiecePosition({ x: targetCoords.x, y: targetCoords.y });
             },
             duration: 1200,
           },
@@ -303,6 +351,13 @@ export const Engine = ({ height, width }: EngineProps) => {
               }
               setPiecesInfo(nextPiecesInfo);
               setEnPassantTarget(nextEnPassantTarget);
+              const moveUci = coordsToUci(
+                attackerPiece.coords.x!, attackerPiece.coords.y!,
+                targetCoords.x!, targetCoords.y!,
+                isPromotion ? 'q' : undefined
+              );
+              addUciMoveRef.current(moveUci);
+              setTurn(GetNegativeColor(attackerPiece.color));
             },
             duration: 500,
           },
@@ -334,6 +389,20 @@ export const Engine = ({ height, width }: EngineProps) => {
     ]
   );
 
+  useEffect(() => {
+    handleSquareClickRef.current = handleSquareClick;
+  }, [handleSquareClick]);
+
+  useEffect(() => {
+    if (pendingAiMoveRef.current && selectedPieceCoords) {
+      const target = pendingAiMoveRef.current;
+      pendingAiMoveRef.current = null;
+      if (handleSquareClickRef.current) {
+        handleSquareClickRef.current(target);
+      }
+    }
+  }, [selectedPieceCoords]);
+
   const renderPieces = useMemo(() => {
     return (
       <AnimatePresence>
@@ -360,12 +429,14 @@ export const Engine = ({ height, width }: EngineProps) => {
 
             const handlePieceClick = (e: React.MouseEvent) => {
               e.stopPropagation();
-              if (isAnimating.current) return;
+              
               if (!isSelectable) {
                 handleSquareClick(piece.coords);
                 return;
               }
-              if (isYourTurn) {
+              
+              const playerColor = playerFaction === 'orc' ? 'black' : 'white';
+              if (isYourTurn && piece.color === playerColor) {
                 setSelectedPieceCoords(piece);
               }
             };
@@ -549,6 +620,18 @@ export const Engine = ({ height, width }: EngineProps) => {
         />
       {renderPieces}
       {renderDyingPiece}
+      {isThinking && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-sm px-6 py-3 rounded-lg border border-amber-900/50 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="text-amber-200 text-sm font-cinzel ml-2">IA pensando...</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

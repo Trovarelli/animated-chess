@@ -1,6 +1,6 @@
 # 🎮 Animated Chess
 
-Um jogo de xadrez moderno e interativo com animações fluidas e uma interface elegante, construído com React e TypeScript.
+Um jogo de xadrez moderno e interativo com animações fluidas, IA integrada com Stockfish e uma interface elegante, construído com React e TypeScript.
 
 ![Chess Game Preview](public/preview.png)
 
@@ -8,6 +8,7 @@ Um jogo de xadrez moderno e interativo com animações fluidas e uma interface e
 
 - 🎨 Interface moderna e responsiva
 - 🎭 Animações fluidas para todas as peças
+- 🤖 Motor de xadrez Stockfish (dificuldade ajustável)
 - 🎯 Validação de movimentos em tempo real
 - 📱 Design responsivo para todos os dispositivos
 - 🏆 Sistema de pontuação
@@ -19,6 +20,7 @@ Um jogo de xadrez moderno e interativo com animações fluidas e uma interface e
 - [Framer Motion](https://www.framer.com/motion/) - Biblioteca de animações
 - [Tailwind CSS](https://tailwindcss.com/) - Framework CSS utilitário
 - [Next.js](https://nextjs.org/) - Framework React para produção
+- [Stockfish](https://stockfishchess.org/) - Motor de xadrez open source para a IA
 - [Cypress](https://www.cypress.io/) - Framework de testes E2E
 - [Jest](https://jestjs.io/) - Framework de testes unitários
 
@@ -47,12 +49,13 @@ npm run dev
 
 ## 🎮 Como Jogar
 
-1. Selecione uma peça clicando nela
-2. As casas válidas para movimento serão destacadas
-3. Clique na casa desejada para mover a peça
-4. O jogo alterna automaticamente entre os jogadores
-5. Capture peças adversárias movendo para suas casas
-6. O objetivo é dar xeque-mate ao rei adversário
+1. Escolha sua facção (Humanos ou Orcs)
+2. Selecione uma peça clicando nela
+3. As casas válidas para movimento serão destacadas
+4. Clique na casa desejada para mover a peça
+5. A IA (Stockfish) responde automaticamente com sua jogada
+6. Capture peças adversárias movendo para suas casas
+7. O objetivo é dar xeque-mate ao rei adversário
 
 ## 🎨 Animações
 
@@ -144,6 +147,7 @@ Este projeto está sob a licença MIT
 ## 🙏 Agradecimentos
 
 - [Chess.com](https://www.chess.com/) pela inspiração
+- [Stockfish](https://stockfishchess.org/) pelo motor de xadrez open source
 - [Framer Motion](https://www.framer.com/motion/) pelas animações
 - [Tailwind CSS](https://tailwindcss.com/) pelo design
 

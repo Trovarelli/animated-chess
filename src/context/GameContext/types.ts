@@ -31,10 +31,14 @@ export type GameContextProps = {
   setGameOver: Dispatch<SetStateAction<GameOverType>>;
   moveHistory: Move[];
   addMove: (move: Move) => void;
+  uciMoveHistory: string[];
+  addUciMove: (uciMove: string) => void;
   isInCheck: boolean;
   setIsInCheck: Dispatch<SetStateAction<boolean>>;
   playerFaction: Faction | null;
   setPlayerFaction: Dispatch<SetStateAction<Faction | null>>;
+  aiDifficulty: number;
+  setAiDifficulty: Dispatch<SetStateAction<number>>;
   resetGame: () => void;
 };
 

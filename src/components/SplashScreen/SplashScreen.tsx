@@ -1,11 +1,11 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Faction } from "@/context/GameContext/types";
 
 interface SplashScreenProps {
-  onStart: (faction: Faction) => void;
+  onStart: (faction: Faction, difficulty: number) => void;
 }
 
 const FactionButton = ({
@@ -47,6 +47,12 @@ const FactionButton = ({
   </motion.button>
 );
 
+const DIFFICULTIES = [
+  { label: "APRENDIZ", subtitle: "Para iniciantes", depth: 3, icon: "⚔️" },
+  { label: "GUERREIRO", subtitle: "Desafio moderado", depth: 8, icon: "🗡️" },
+  { label: "MESTRE", subtitle: "Adversário implacável", depth: 15, icon: "👑" },
+];
+
 const HumanIcon = () => (
   <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-md">
     <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="rgba(245, 158, 11, 0.1)" />
@@ -64,6 +70,8 @@ const OrcIcon = () => (
 );
 
 export const SplashScreen = ({ onStart }: SplashScreenProps) => {
+  const [selectedFaction, setSelectedFaction] = useState<Faction | null>(null);
+
   return (
     <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#0c0a09] overflow-hidden">
       <motion.div
@@ -100,34 +108,94 @@ export const SplashScreen = ({ onStart }: SplashScreenProps) => {
           </motion.div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.0, duration: 0.8 }}
-        >
-          <span className="text-[10px] uppercase font-black tracking-[0.5em] text-stone-600 font-cinzel">
-            Escolha sua facção
-          </span>
-        </motion.div>
+        <AnimatePresence mode="wait">
+          {!selectedFaction ? (
+            <motion.div
+              key="faction-select"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center gap-8"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.0, duration: 0.8 }}
+              >
+                <span className="text-[10px] uppercase font-black tracking-[0.5em] text-stone-600 font-cinzel">
+                  Escolha sua facção
+                </span>
+              </motion.div>
 
-        <div className="flex gap-6">
-          <FactionButton
-            faction="human"
-            label="HUMANOS"
-            subtitle="Império"
-            icon={<HumanIcon />}
-            onSelect={onStart}
-            delay={1.2}
-          />
-          <FactionButton
-            faction="orc"
-            label="ORCS"
-            subtitle="Clã"
-            icon={<OrcIcon />}
-            onSelect={onStart}
-            delay={1.4}
-          />
-        </div>
+              <div className="flex gap-6">
+                <FactionButton
+                  faction="human"
+                  label="HUMANOS"
+                  subtitle="Império"
+                  icon={<HumanIcon />}
+                  onSelect={setSelectedFaction}
+                  delay={1.2}
+                />
+                <FactionButton
+                  faction="orc"
+                  label="ORCS"
+                  subtitle="Clã"
+                  icon={<OrcIcon />}
+                  onSelect={setSelectedFaction}
+                  delay={1.4}
+                />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="difficulty-select"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center gap-8"
+            >
+              <span className="text-[10px] uppercase font-black tracking-[0.5em] text-stone-600 font-cinzel">
+                Nível de dificuldade
+              </span>
+
+              <div className="flex gap-4">
+                {DIFFICULTIES.map((diff, i) => (
+                  <motion.button
+                    key={diff.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: i * 0.1 }}
+                    onClick={() => onStart(selectedFaction, diff.depth)}
+                    className="group relative flex flex-col items-center gap-3 px-8 py-6 overflow-hidden bg-transparent border border-amber-500/20 rounded-sm transition-all duration-300 hover:border-amber-500 hover:shadow-[0_0_30px_rgba(217,119,6,0.25)] active:scale-95 w-44"
+                  >
+                    <div className="absolute inset-0 w-0 bg-amber-500/10 transition-all duration-300 group-hover:w-full" />
+                    <span className="relative text-3xl">{diff.icon}</span>
+                    <div className="relative flex flex-col items-center gap-1">
+                      <span className="text-xs font-black tracking-[0.3em] text-amber-500 font-cinzel">
+                        {diff.label}
+                      </span>
+                      <span className="text-[9px] uppercase tracking-[0.2em] text-stone-600 group-hover:text-stone-400 transition-colors font-bold">
+                        {diff.subtitle}
+                      </span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                transition={{ delay: 0.5 }}
+                onClick={() => setSelectedFaction(null)}
+                className="text-[9px] uppercase tracking-[0.3em] text-stone-600 hover:text-amber-500 transition-colors font-cinzel cursor-pointer"
+              >
+                ← Voltar
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <motion.div
           initial={{ opacity: 0 }}
